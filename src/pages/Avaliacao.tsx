@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAthlete, saveAthlete, type Assessment } from "@/lib/storage";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { getPositionRecommendation } from "@/lib/trainings";
 import BottomNav from "@/components/BottomNav";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import { Activity, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const categoryColors = {
+const categoryColors: Record<string, string> = {
   Elite: "text-primary bg-primary/20 border-primary/30",
   Bom: "text-highlight bg-highlight/20 border-highlight/30",
   Desenvolver: "text-destructive bg-destructive/20 border-destructive/30",
@@ -19,7 +20,9 @@ function calculateIMC(weight: number, height: number) {
   return weight / (height * height);
 }
 
-function determineCategory(imc: number, fat: number, run12: number): Assessment["category"] {
+type Category = "Elite" | "Bom" | "Desenvolver";
+
+function determineCategory(imc: number, fat: number, run12: number): Category {
   let score = 0;
   if (imc >= 20 && imc <= 24) score += 2;
   else if (imc >= 18.5 && imc <= 27) score += 1;
@@ -34,19 +37,29 @@ function determineCategory(imc: number, fat: number, run12: number): Assessment[
 
 const Avaliacao = () => {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
   const [fat, setFat] = useState("");
   const [run12, setRun12] = useState("");
   const [sprint30, setSprint30] = useState("");
-  const [result, setResult] = useState<{ imc: number; category: Assessment["category"]; recommendation: string } | null>(null);
+  const [result, setResult] = useState<{ imc: number; category: Category; recommendation: string } | null>(null);
   const [position, setPosition] = useState("");
 
   useEffect(() => {
-    const athlete = getAthlete();
-    if (!athlete) { navigate("/"); return; }
-    setPosition(athlete.position);
-  }, [navigate]);
+    if (authLoading) return;
+    if (!user) { navigate("/login"); return; }
+
+    const fetchProfile = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("position")
+        .eq("user_id", user.id)
+        .single();
+      if (data) setPosition(data.position);
+    };
+    fetchProfile();
+  }, [user, authLoading, navigate]);
 
   const handleCalculate = () => {
     if (!weight || !height || !fat || !run12 || !sprint30) {
@@ -63,20 +76,20 @@ const Avaliacao = () => {
     setResult({ imc, category, recommendation });
   };
 
-  const handleSave = () => {
-    if (!result) return;
-    const athlete = getAthlete();
-    if (!athlete) return;
-    const assessment: Assessment = {
-      date: new Date().toISOString(),
+  const handleSave = async () => {
+    if (!result || !user) return;
+    const { error } = await supabase.from("assessments").insert({
+      user_id: user.id,
       imc: result.imc,
-      fatPercentage: parseFloat(fat),
-      run12min: parseFloat(run12),
-      sprint30m: parseFloat(sprint30),
+      fat_percentage: parseFloat(fat),
+      run_12min: parseFloat(run12),
+      sprint_30m: parseFloat(sprint30),
       category: result.category,
-    };
-    athlete.assessments = [...(athlete.assessments || []), assessment];
-    saveAthlete(athlete);
+    });
+    if (error) {
+      toast.error("Erro ao salvar avaliação");
+      return;
+    }
     toast.success("Avaliação salva com sucesso!");
   };
 
@@ -88,7 +101,6 @@ const Avaliacao = () => {
           <h1 className="font-heading text-xl font-bold">Check-up do Atleta</h1>
         </div>
 
-        {/* IMC Calculator */}
         <div className="gradient-card rounded-xl p-5 border border-border/20 mb-4 animate-slide-up">
           <h2 className="font-heading text-base font-bold mb-4 flex items-center gap-2">
             <Activity className="w-4 h-4 text-highlight" />
@@ -100,7 +112,6 @@ const Avaliacao = () => {
           </div>
         </div>
 
-        {/* Extra fields */}
         <div className="gradient-card rounded-xl p-5 border border-border/20 mb-4 animate-slide-up" style={{ animationDelay: "0.1s" }}>
           <h2 className="font-heading text-base font-bold mb-4">Avaliação Completa</h2>
           <div className="space-y-3">
@@ -118,7 +129,6 @@ const Avaliacao = () => {
           Calcular avaliação
         </Button>
 
-        {/* Result */}
         {result && (
           <div className="animate-scale-in space-y-4">
             <div className={cn("rounded-xl p-5 border text-center", categoryColors[result.category])}>
