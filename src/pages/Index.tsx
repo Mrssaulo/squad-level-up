@@ -1,3 +1,3 @@
-import Login from "./Login";
-const Index = () => <Login />;
+import LandingPage from "./LandingPage";
+const Index = () => <LandingPage />;
 export default Index;
