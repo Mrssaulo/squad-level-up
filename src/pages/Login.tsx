@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trophy } from "lucide-react";
+import { Trophy, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 const positions = ["Goleiro", "Zagueiro", "Lateral", "Volante", "Meia", "Ponta", "Centroavante"];
@@ -20,6 +21,10 @@ const Login = () => {
   const [age, setAge] = useState("");
   const [objective, setObjective] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [forgotMode, setForgotMode] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,14 +121,23 @@ const Login = () => {
 
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Senha</label>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              minLength={6}
-              className="bg-muted/50 border-border/50 focus:border-primary h-12"
-            />
+          <div className="relative">
+              <Input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                minLength={6}
+                className="bg-muted/50 border-border/50 focus:border-primary h-12 pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           {isSignUp && (
@@ -176,6 +190,58 @@ const Login = () => {
             {loading ? "Carregando..." : isSignUp ? "⚽ Criar conta" : "⚽ Entrar no vestiário"}
           </Button>
         </form>
+
+        {!isSignUp && !forgotMode && (
+          <button
+            type="button"
+            onClick={() => setForgotMode(true)}
+            className="block w-full text-center text-primary text-sm mt-4 hover:underline"
+          >
+            Esqueci minha senha
+          </button>
+        )}
+
+        {forgotMode && (
+          <div className="mt-6 space-y-3 animate-fade-in">
+            <p className="text-sm text-muted-foreground text-center">
+              Digite seu email para receber o link de redefinição
+            </p>
+            <Input
+              type="email"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              placeholder="seu@email.com"
+              className="bg-muted/50 border-border/50 focus:border-primary h-12"
+            />
+            <Button
+              type="button"
+              disabled={forgotLoading || !forgotEmail}
+              onClick={async () => {
+                setForgotLoading(true);
+                const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+                  redirectTo: `${window.location.origin}/reset-password`,
+                });
+                setForgotLoading(false);
+                if (error) {
+                  toast.error(error.message);
+                } else {
+                  toast.success("Email de redefinição enviado! Verifique sua caixa de entrada.");
+                  setForgotMode(false);
+                }
+              }}
+              className="w-full h-12 bg-primary hover:bg-primary/90"
+            >
+              {forgotLoading ? "Enviando..." : "Enviar link de redefinição"}
+            </Button>
+            <button
+              type="button"
+              onClick={() => setForgotMode(false)}
+              className="block w-full text-center text-muted-foreground text-xs hover:underline"
+            >
+              Voltar ao login
+            </button>
+          </div>
+        )}
 
         <p className="text-center text-muted-foreground text-xs mt-6">
           Treine como profissional. Evolua como campeão.
