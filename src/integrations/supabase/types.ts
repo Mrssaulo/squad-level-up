@@ -14,7 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assessments: {
+        Row: {
+          category: string
+          created_at: string
+          fat_percentage: number | null
+          id: string
+          imc: number
+          run_12min: number | null
+          sprint_30m: number | null
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          fat_percentage?: number | null
+          id?: string
+          imc: number
+          run_12min?: number | null
+          sprint_30m?: number | null
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          fat_percentage?: number | null
+          id?: string
+          imc?: number
+          run_12min?: number | null
+          sprint_30m?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      completed_trainings: {
+        Row: {
+          completed_at: string
+          id: string
+          training_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          training_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          training_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          age: number
+          created_at: string
+          days_until_game: number
+          email: string | null
+          id: string
+          level: string
+          name: string
+          objective: string | null
+          physical_level: number
+          position: string
+          total_trainings: number
+          trainings_this_week: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age?: number
+          created_at?: string
+          days_until_game?: number
+          email?: string | null
+          id?: string
+          level?: string
+          name?: string
+          objective?: string | null
+          physical_level?: number
+          position?: string
+          total_trainings?: number
+          trainings_this_week?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age?: number
+          created_at?: string
+          days_until_game?: number
+          email?: string | null
+          id?: string
+          level?: string
+          name?: string
+          objective?: string | null
+          physical_level?: number
+          position?: string
+          total_trainings?: number
+          trainings_this_week?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
