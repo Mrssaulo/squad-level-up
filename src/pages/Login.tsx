@@ -191,6 +191,58 @@ const Login = () => {
           </Button>
         </form>
 
+        {!isSignUp && !forgotMode && (
+          <button
+            type="button"
+            onClick={() => setForgotMode(true)}
+            className="block w-full text-center text-primary text-sm mt-4 hover:underline"
+          >
+            Esqueci minha senha
+          </button>
+        )}
+
+        {forgotMode && (
+          <div className="mt-6 space-y-3 animate-fade-in">
+            <p className="text-sm text-muted-foreground text-center">
+              Digite seu email para receber o link de redefinição
+            </p>
+            <Input
+              type="email"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              placeholder="seu@email.com"
+              className="bg-muted/50 border-border/50 focus:border-primary h-12"
+            />
+            <Button
+              type="button"
+              disabled={forgotLoading || !forgotEmail}
+              onClick={async () => {
+                setForgotLoading(true);
+                const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+                  redirectTo: `${window.location.origin}/reset-password`,
+                });
+                setForgotLoading(false);
+                if (error) {
+                  toast.error(error.message);
+                } else {
+                  toast.success("Email de redefinição enviado! Verifique sua caixa de entrada.");
+                  setForgotMode(false);
+                }
+              }}
+              className="w-full h-12 bg-primary hover:bg-primary/90"
+            >
+              {forgotLoading ? "Enviando..." : "Enviar link de redefinição"}
+            </Button>
+            <button
+              type="button"
+              onClick={() => setForgotMode(false)}
+              className="block w-full text-center text-muted-foreground text-xs hover:underline"
+            >
+              Voltar ao login
+            </button>
+          </div>
+        )}
+
         <p className="text-center text-muted-foreground text-xs mt-6">
           Treine como profissional. Evolua como campeão.
         </p>
