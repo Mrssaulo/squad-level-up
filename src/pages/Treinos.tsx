@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { trainings, type Training } from "@/lib/trainings";
-import { getAthlete, saveAthlete } from "@/lib/storage";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,16 +20,25 @@ const difficultyColors: Record<string, string> = {
 
 const Treinos = () => {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<string>("Todos");
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [plan, setPlan] = useState<string[]>([]);
+  const [completedIds, setCompletedIds] = useState<string[]>([]);
 
   useEffect(() => {
-    const athlete = getAthlete();
-    if (!athlete) { navigate("/"); return; }
-    setPlan(athlete.plan || []);
-  }, [navigate]);
+    if (authLoading) return;
+    if (!user) { navigate("/login"); return; }
+
+    const fetchCompleted = async () => {
+      const { data } = await supabase
+        .from("completed_trainings")
+        .select("training_id")
+        .eq("user_id", user.id);
+      if (data) setCompletedIds(data.map((d) => d.training_id));
+    };
+    fetchCompleted();
+  }, [user, authLoading, navigate]);
 
   const filtered = trainings.filter((t) => {
     const matchCategory = filter === "Todos" || t.category === filter;
@@ -36,16 +46,21 @@ const Treinos = () => {
     return matchCategory && matchSearch;
   });
 
-  const addToPlan = (training: Training) => {
-    const athlete = getAthlete();
-    if (!athlete) return;
-    if (athlete.plan.includes(training.id)) {
+  const addToPlan = async (training: Training) => {
+    if (!user) return;
+    if (completedIds.includes(training.id)) {
       toast.info("Treino já está no plano!");
       return;
     }
-    athlete.plan = [...athlete.plan, training.id];
-    saveAthlete(athlete);
-    setPlan(athlete.plan);
+    const { error } = await supabase.from("completed_trainings").insert({
+      user_id: user.id,
+      training_id: training.id,
+    });
+    if (error) {
+      toast.error("Erro ao adicionar treino");
+      return;
+    }
+    setCompletedIds([...completedIds, training.id]);
     toast.success(`"${training.title}" adicionado ao plano!`);
   };
 
@@ -54,7 +69,6 @@ const Treinos = () => {
       <div className="px-4 pt-6 max-w-md mx-auto">
         <h1 className="font-heading text-xl font-bold mb-4 animate-fade-in">Biblioteca de Treinos</h1>
 
-        {/* Search */}
         <div className="relative mb-4 animate-fade-in">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
@@ -65,7 +79,6 @@ const Treinos = () => {
           />
         </div>
 
-        {/* Filters */}
         <div className="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide animate-fade-in">
           {categories.map((cat) => (
             <button
@@ -83,11 +96,10 @@ const Treinos = () => {
           ))}
         </div>
 
-        {/* Training list */}
         <div className="space-y-3">
           {filtered.map((training, i) => {
             const isExpanded = expanded === training.id;
-            const inPlan = plan.includes(training.id);
+            const inPlan = completedIds.includes(training.id);
             return (
               <div
                 key={training.id}

@@ -1,72 +1,122 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAthlete, saveAthlete, calculateLevel, type Athlete } from "@/lib/storage";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
-import { Activity, Timer, Shield, Trophy, Flame } from "lucide-react";
+import { Activity, Timer, Shield, Trophy, Flame, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
-const levelColors = {
+interface Profile {
+  name: string;
+  position: string;
+  age: number;
+  level: string;
+  trainings_this_week: number;
+  total_trainings: number;
+  physical_level: number;
+  days_until_game: number;
+}
+
+const levelColors: Record<string, string> = {
   Iniciante: "bg-muted text-muted-foreground",
   Titular: "bg-primary/20 text-primary",
   Estrela: "bg-highlight/20 text-highlight",
 };
 
+function calculateLevel(total: number) {
+  if (total >= 50) return "Estrela";
+  if (total >= 20) return "Titular";
+  return "Iniciante";
+}
+
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [athlete, setAthlete] = useState<Athlete | null>(null);
+  const { user, signOut, loading: authLoading } = useAuth();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [completedCount, setCompletedCount] = useState(0);
 
   useEffect(() => {
-    const data = getAthlete();
-    if (!data) { navigate("/"); return; }
-    setAthlete(data);
-  }, [navigate]);
+    if (authLoading) return;
+    if (!user) { navigate("/login"); return; }
 
-  if (!athlete) return <DashboardSkeleton />;
+    const fetchData = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+      if (data) setProfile(data);
 
-  const chartData = athlete.evolutionData.map((val, i) => ({ day: i + 1, score: val }));
-
-  const handleStartTraining = () => {
-    const updated = {
-      ...athlete,
-      trainingsThisWeek: Math.min(athlete.trainingsThisWeek + 1, 5),
-      totalTrainings: athlete.totalTrainings + 1,
-      physicalLevel: Math.min(athlete.physicalLevel + 1, 100),
+      const { count } = await supabase
+        .from("completed_trainings")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
+      setCompletedCount(count || 0);
     };
-    updated.level = calculateLevel(updated.totalTrainings);
-    updated.evolutionData = [...updated.evolutionData.slice(1), updated.physicalLevel];
-    saveAthlete(updated);
-    setAthlete(updated);
+    fetchData();
+  }, [user, authLoading, navigate]);
+
+  if (authLoading || !profile) return <DashboardSkeleton />;
+
+  const chartData = Array.from({ length: 30 }, (_, i) => ({
+    day: i + 1,
+    score: Math.floor(Math.random() * 30) + profile.physical_level - 15,
+  }));
+
+  const handleStartTraining = async () => {
+    if (!user) return;
+    const newWeek = Math.min(profile.trainings_this_week + 1, 5);
+    const newTotal = profile.total_trainings + 1;
+    const newLevel = calculateLevel(newTotal);
+    const newPhysical = Math.min(profile.physical_level + 1, 100);
+
+    await supabase.from("profiles").update({
+      trainings_this_week: newWeek,
+      total_trainings: newTotal,
+      level: newLevel,
+      physical_level: newPhysical,
+    }).eq("user_id", user.id);
+
+    setProfile({ ...profile, trainings_this_week: newWeek, total_trainings: newTotal, level: newLevel, physical_level: newPhysical });
+    toast.success("Treino registrado! 🔥");
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
   };
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
       <div className="gradient-field px-4 pt-6 pb-8">
         <div className="flex items-center gap-3 animate-fade-in">
           <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center text-2xl border-2 border-primary/50">
             ⚽
           </div>
           <div className="flex-1">
-            <h2 className="font-heading text-lg font-bold text-foreground">{athlete.name}</h2>
-            <p className="text-sm text-muted-foreground">{athlete.position} • {athlete.age} anos</p>
+            <h2 className="font-heading text-lg font-bold text-foreground">{profile.name}</h2>
+            <p className="text-sm text-muted-foreground">{profile.position} • {profile.age} anos</p>
           </div>
-          <span className={cn("px-3 py-1 rounded-full text-xs font-bold", levelColors[athlete.level])}>
-            {athlete.level === "Estrela" && "⭐ "}{athlete.level}
+          <span className={cn("px-3 py-1 rounded-full text-xs font-bold", levelColors[profile.level] || levelColors.Iniciante)}>
+            {profile.level === "Estrela" && "⭐ "}{profile.level}
           </span>
+          <button onClick={handleLogout} className="text-muted-foreground hover:text-foreground transition-colors">
+            <LogOut className="w-5 h-5" />
+          </button>
         </div>
       </div>
 
       <div className="px-4 -mt-4 space-y-4 max-w-md mx-auto">
-        {/* Treino do dia */}
         <div className="gradient-card rounded-xl p-5 border border-border/30 animate-slide-up" style={{ animationDelay: "0.1s" }}>
           <div className="flex items-center gap-2 mb-3">
             <Flame className="w-5 h-5 text-highlight" />
             <h3 className="font-heading text-base font-bold">Treino de hoje</h3>
           </div>
           <p className="text-sm text-muted-foreground mb-4">
-            Força e resistência — {athlete.position === "Goleiro" ? "reflexos e explosão" : "condicionamento e potência"}
+            Força e resistência — {profile.position === "Goleiro" ? "reflexos e explosão" : "condicionamento e potência"}
           </p>
           <Button
             onClick={handleStartTraining}
@@ -76,12 +126,11 @@ const Dashboard = () => {
           </Button>
         </div>
 
-        {/* Métricas */}
         <div className="grid grid-cols-3 gap-3">
           {[
-            { icon: Activity, label: "Treinos semana", value: `${athlete.trainingsThisWeek}/5`, color: "text-primary" },
-            { icon: Shield, label: "Nível físico", value: `${athlete.physicalLevel}%`, color: "text-highlight" },
-            { icon: Timer, label: "Dias até jogo", value: `${athlete.daysUntilGame}`, color: "text-primary" },
+            { icon: Activity, label: "Treinos semana", value: `${profile.trainings_this_week}/5`, color: "text-primary" },
+            { icon: Shield, label: "Nível físico", value: `${profile.physical_level}%`, color: "text-highlight" },
+            { icon: Timer, label: "Treinos total", value: `${completedCount}`, color: "text-primary" },
           ].map(({ icon: Icon, label, value, color }, i) => (
             <div
               key={label}
@@ -95,7 +144,6 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Gráfico evolução */}
         <div className="gradient-card rounded-xl p-4 border border-border/20 animate-slide-up" style={{ animationDelay: "0.5s" }}>
           <div className="flex items-center gap-2 mb-3">
             <Trophy className="w-4 h-4 text-highlight" />
