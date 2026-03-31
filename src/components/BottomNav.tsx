@@ -1,10 +1,11 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, Dumbbell, User, Brain } from "lucide-react";
+import { Chrome as Home, Dumbbell, User, Brain, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { path: "/dashboard", label: "Início", icon: Home },
   { path: "/treinos", label: "Treinos", icon: Dumbbell },
+  { path: "/historico", label: "Histórico", icon: History },
   { path: "/personal", label: "Coach IA", icon: Brain },
   { path: "/avaliacao", label: "Perfil", icon: User },
 ];

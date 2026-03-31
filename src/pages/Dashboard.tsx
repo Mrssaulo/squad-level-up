@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
-import { Activity, Timer, Shield, Trophy, Flame, LogOut, Brain, Loader2 } from "lucide-react";
+import { Activity, Timer, Shield, Trophy, Flame, LogOut, Brain, Loader as Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
 import { cn } from "@/lib/utils";
@@ -84,22 +84,17 @@ const Dashboard = () => {
     score: Math.floor(Math.random() * 30) + profile.physical_level - 15,
   }));
 
-  const handleStartTraining = async () => {
-    if (!user) return;
-    const newWeek = Math.min(profile.trainings_this_week + 1, 5);
-    const newTotal = profile.total_trainings + 1;
-    const newLevel = calculateLevel(newTotal);
-    const newPhysical = Math.min(profile.physical_level + 1, 100);
-
-    await supabase.from("profiles").update({
-      trainings_this_week: newWeek,
-      total_trainings: newTotal,
-      level: newLevel,
-      physical_level: newPhysical,
-    }).eq("user_id", user.id);
-
-    setProfile({ ...profile, trainings_this_week: newWeek, total_trainings: newTotal, level: newLevel, physical_level: newPhysical });
-    toast.success("Treino registrado! 🔥");
+  const handleStartTraining = () => {
+    if (!aiSuggestion) {
+      toast.error("Aguarde a IA gerar o treino do dia!");
+      return;
+    }
+    navigate("/active-training", {
+      state: {
+        training: aiSuggestion,
+        position: profile.position,
+      },
+    });
   };
 
   const handleLogout = async () => {

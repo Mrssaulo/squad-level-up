@@ -10,6 +10,9 @@ import Dashboard from "./pages/Dashboard";
 import Treinos from "./pages/Treinos";
 import Avaliacao from "./pages/Avaliacao";
 import PersonalTrainer from "./pages/PersonalTrainer";
+import ActiveTraining from "./pages/ActiveTraining";
+import TrainingComplete from "./pages/TrainingComplete";
+import Historico from "./pages/Historico";
 import FloatingChat from "./components/FloatingChat";
 import NotFound from "./pages/NotFound";
 
@@ -29,6 +32,9 @@ const App = () => (
             <Route path="/treinos" element={<Treinos />} />
             <Route path="/avaliacao" element={<Avaliacao />} />
             <Route path="/personal" element={<PersonalTrainer />} />
+            <Route path="/active-training" element={<ActiveTraining />} />
+            <Route path="/training-complete" element={<TrainingComplete />} />
+            <Route path="/historico" element={<Historico />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <FloatingChat />
