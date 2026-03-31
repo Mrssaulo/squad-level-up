@@ -92,6 +92,24 @@ const Avaliacao = () => {
     const category = determineCategory(imc, f, r);
     const detailed = getDetailedAssessment(position, category, imc, f, r);
     setResult({ imc, category, ...detailed });
+    setAiAnalysis("");
+  };
+
+  const handleAIAnalysis = async () => {
+    if (!result) return;
+    setAiLoading(true);
+    try {
+      const analysis = await callAI(
+        [{ role: "user", content: "Analise minha avaliação física e me dê um diagnóstico completo." }],
+        "assessment-analysis",
+        { position, imc: result.imc, category: result.category, conditioningLevel: result.conditioningLevel, fatPercentage: parseFloat(fat), run12min: parseFloat(run12), sprint30m: parseFloat(sprint30) }
+      );
+      setAiAnalysis(analysis);
+    } catch (e: any) {
+      toast.error(e.message || "Erro na análise IA");
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   const handleSave = async () => {
