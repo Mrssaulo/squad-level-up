@@ -61,6 +61,8 @@ const Avaliacao = () => {
     recommendation: string;
   } | null>(null);
   const [position, setPosition] = useState("");
+  const [aiAnalysis, setAiAnalysis] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
