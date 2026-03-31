@@ -130,12 +130,27 @@ const Dashboard = () => {
       <div className="px-4 -mt-4 space-y-4 max-w-md mx-auto">
         <div className="gradient-card rounded-xl p-5 border border-border/30 animate-slide-up" style={{ animationDelay: "0.1s" }}>
           <div className="flex items-center gap-2 mb-3">
-            <Flame className="w-5 h-5 text-highlight" />
-            <h3 className="font-heading text-base font-bold">Treino de hoje</h3>
+            {aiLoading ? <Loader2 className="w-5 h-5 text-primary animate-spin" /> : <Brain className="w-5 h-5 text-primary" />}
+            <h3 className="font-heading text-base font-bold">
+              {aiSuggestion ? "🧠 Treino sugerido pela IA" : "Treino de hoje"}
+            </h3>
           </div>
-          <p className="text-sm text-muted-foreground mb-4">
-            Força e resistência — {profile.position === "Goleiro" ? "reflexos e explosão" : "condicionamento e potência"}
+          <p className="text-sm text-muted-foreground mb-2">
+            {aiSuggestion ? aiSuggestion.title : `Força e resistência — ${profile.position === "Goleiro" ? "reflexos e explosão" : "condicionamento e potência"}`}
           </p>
+          {aiSuggestion && (
+            <p className="text-xs text-muted-foreground mb-3">{aiSuggestion.description}</p>
+          )}
+          {aiSuggestion?.exercises && (
+            <div className="space-y-1.5 mb-4">
+              {aiSuggestion.exercises.slice(0, 4).map((ex: any, i: number) => (
+                <div key={i} className="flex items-center justify-between text-xs bg-muted/30 rounded-lg px-3 py-1.5">
+                  <span className="text-foreground font-medium">{ex.name}</span>
+                  <span className="text-muted-foreground">{ex.sets}x{ex.reps}</span>
+                </div>
+              ))}
+            </div>
+          )}
           <Button
             onClick={handleStartTraining}
             className="w-full h-12 font-heading font-bold bg-primary hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-[0.98]"
