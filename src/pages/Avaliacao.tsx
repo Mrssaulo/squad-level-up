@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getDetailedAssessment } from "@/lib/trainings";
+import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Activity, Shield, TrendingUp, TrendingDown, Zap, CheckCircle } from "lucide-react";
+import { Activity, Shield, TrendingUp, TrendingDown, Zap, CheckCircle, Brain, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
