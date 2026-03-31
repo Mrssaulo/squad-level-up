@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { getPositionRecommendation } from "@/lib/trainings";
+import { getDetailedAssessment } from "@/lib/trainings";
 import BottomNav from "@/components/BottomNav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Activity, Shield } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Activity, Shield, TrendingUp, TrendingDown, Zap, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -14,6 +15,13 @@ const categoryColors: Record<string, string> = {
   Elite: "text-primary bg-primary/20 border-primary/30",
   Bom: "text-highlight bg-highlight/20 border-highlight/30",
   Desenvolver: "text-destructive bg-destructive/20 border-destructive/30",
+};
+
+const conditioningColors: Record<string, string> = {
+  Excelente: "text-primary",
+  Bom: "text-highlight",
+  Regular: "text-orange-400",
+  Baixo: "text-destructive",
 };
 
 function calculateIMC(weight: number, height: number) {
@@ -43,7 +51,14 @@ const Avaliacao = () => {
   const [fat, setFat] = useState("");
   const [run12, setRun12] = useState("");
   const [sprint30, setSprint30] = useState("");
-  const [result, setResult] = useState<{ imc: number; category: Category; recommendation: string } | null>(null);
+  const [result, setResult] = useState<{
+    imc: number;
+    category: Category;
+    conditioningLevel: string;
+    strengths: string[];
+    improvements: string[];
+    recommendation: string;
+  } | null>(null);
   const [position, setPosition] = useState("");
 
   useEffect(() => {
@@ -72,8 +87,8 @@ const Avaliacao = () => {
     const r = parseFloat(run12);
     const imc = calculateIMC(w, h);
     const category = determineCategory(imc, f, r);
-    const recommendation = getPositionRecommendation(position, category);
-    setResult({ imc, category, recommendation });
+    const detailed = getDetailedAssessment(position, category, imc, f, r);
+    setResult({ imc, category, ...detailed });
   };
 
   const handleSave = async () => {
@@ -92,6 +107,13 @@ const Avaliacao = () => {
     }
     toast.success("Avaliação salva com sucesso!");
   };
+
+  const conditioningPercent = result
+    ? result.conditioningLevel === "Excelente" ? 95
+    : result.conditioningLevel === "Bom" ? 70
+    : result.conditioningLevel === "Regular" ? 45
+    : 25
+    : 0;
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -131,12 +153,62 @@ const Avaliacao = () => {
 
         {result && (
           <div className="animate-scale-in space-y-4">
+            {/* Category badge */}
             <div className={cn("rounded-xl p-5 border text-center", categoryColors[result.category])}>
               <p className="text-sm font-medium mb-1">Categoria</p>
               <p className="text-3xl font-heading font-extrabold">{result.category}</p>
               <p className="text-sm mt-2">IMC: {result.imc.toFixed(1)}</p>
             </div>
 
+            {/* Conditioning level */}
+            <div className="gradient-card rounded-xl p-5 border border-border/20">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-highlight" />
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Condicionamento</p>
+                </div>
+                <span className={cn("font-heading font-bold text-lg", conditioningColors[result.conditioningLevel])}>
+                  {result.conditioningLevel}
+                </span>
+              </div>
+              <Progress value={conditioningPercent} className="h-2.5" />
+            </div>
+
+            {/* Strengths */}
+            <div className="gradient-card rounded-xl p-5 border border-border/20">
+              <div className="flex items-center gap-2 mb-3">
+                <TrendingUp className="w-4 h-4 text-primary" />
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Pontos fortes</p>
+              </div>
+              <ul className="space-y-2">
+                {result.strengths.map((s, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-foreground">
+                    <CheckCircle className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Improvements */}
+            {result.improvements.length > 0 && (
+              <div className="gradient-card rounded-xl p-5 border border-border/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <TrendingDown className="w-4 h-4 text-destructive" />
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Pontos a melhorar</p>
+                </div>
+                <ul className="space-y-2">
+                  {result.improvements.map((s, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-foreground">
+                      <span className="w-4 h-4 rounded-full bg-destructive/20 flex items-center justify-center text-destructive text-[10px] mt-0.5 shrink-0">!</span>
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Recommendation */}
             <div className="gradient-card rounded-xl p-5 border border-border/20">
               <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Recomendação para {position}</p>
               <p className="text-sm font-medium text-foreground">{result.recommendation}</p>
