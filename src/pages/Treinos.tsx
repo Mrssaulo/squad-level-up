@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { trainings, type Training } from "@/lib/trainings";
+import { trainings, positionFilters, type Training } from "@/lib/trainings";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, Check } from "lucide-react";
+import { Search, Plus, Check, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -23,27 +23,34 @@ const Treinos = () => {
   const { user, loading: authLoading } = useAuth();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<string>("Todos");
+  const [posFilter, setPosFilter] = useState<string>("Todos");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [completedIds, setCompletedIds] = useState<string[]>([]);
+  const [userPosition, setUserPosition] = useState("");
 
   useEffect(() => {
     if (authLoading) return;
     if (!user) { navigate("/login"); return; }
 
-    const fetchCompleted = async () => {
-      const { data } = await supabase
-        .from("completed_trainings")
-        .select("training_id")
-        .eq("user_id", user.id);
-      if (data) setCompletedIds(data.map((d) => d.training_id));
+    const fetchData = async () => {
+      const [{ data: completed }, { data: profile }] = await Promise.all([
+        supabase.from("completed_trainings").select("training_id").eq("user_id", user.id),
+        supabase.from("profiles").select("position").eq("user_id", user.id).single(),
+      ]);
+      if (completed) setCompletedIds(completed.map((d) => d.training_id));
+      if (profile) {
+        setUserPosition(profile.position);
+        setPosFilter(profile.position);
+      }
     };
-    fetchCompleted();
+    fetchData();
   }, [user, authLoading, navigate]);
 
   const filtered = trainings.filter((t) => {
     const matchCategory = filter === "Todos" || t.category === filter;
+    const matchPosition = posFilter === "Todos" || t.positions.includes(posFilter);
     const matchSearch = t.title.toLowerCase().includes(search.toLowerCase());
-    return matchCategory && matchSearch;
+    return matchCategory && matchPosition && matchSearch;
   });
 
   const addToPlan = async (training: Training) => {
@@ -79,6 +86,31 @@ const Treinos = () => {
           />
         </div>
 
+        {/* Position filter */}
+        <div className="mb-3 animate-fade-in">
+          <div className="flex items-center gap-1.5 mb-2">
+            <User className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Posição</span>
+          </div>
+          <div className="flex gap-1.5 overflow-x-auto pb-2 scrollbar-hide">
+            {positionFilters.map((pos) => (
+              <button
+                key={pos}
+                onClick={() => setPosFilter(pos)}
+                className={cn(
+                  "px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all",
+                  posFilter === pos
+                    ? "bg-highlight text-highlight-foreground"
+                    : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                )}
+              >
+                {pos}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Category filter */}
         <div className="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide animate-fade-in">
           {categories.map((cat) => (
             <button
@@ -97,6 +129,9 @@ const Treinos = () => {
         </div>
 
         <div className="space-y-3">
+          {filtered.length === 0 && (
+            <p className="text-center text-muted-foreground text-sm py-8">Nenhum treino encontrado para esses filtros.</p>
+          )}
           {filtered.map((training, i) => {
             const isExpanded = expanded === training.id;
             const inPlan = completedIds.includes(training.id);
@@ -119,7 +154,12 @@ const Treinos = () => {
                 </div>
                 {isExpanded && (
                   <div className="px-4 pb-4 animate-fade-in">
-                    <p className="text-sm text-muted-foreground mb-3">{training.description}</p>
+                    <p className="text-sm text-muted-foreground mb-2">{training.description}</p>
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {training.positions.map((pos) => (
+                        <span key={pos} className="text-[10px] px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">{pos}</span>
+                      ))}
+                    </div>
                     <Button
                       size="sm"
                       onClick={(e) => { e.stopPropagation(); addToPlan(training); }}

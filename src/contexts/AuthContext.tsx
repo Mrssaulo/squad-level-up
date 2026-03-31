@@ -35,23 +35,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signUp = async (email: string, password: string, meta: { name: string; position: string; age: number; objective?: string }) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { name: meta.name } },
     });
 
-    if (!error) {
-      // Update profile with extra fields after trigger creates it
-      const { data: { user: newUser } } = await supabase.auth.getUser();
-      if (newUser) {
-        await supabase.from("profiles").update({
-          name: meta.name,
-          position: meta.position,
-          age: meta.age,
-          objective: meta.objective || "",
-        }).eq("user_id", newUser.id);
-      }
+    if (!error && data.user) {
+      // Wait a moment for the trigger to create the profile
+      await new Promise((r) => setTimeout(r, 500));
+      await supabase.from("profiles").update({
+        name: meta.name,
+        position: meta.position,
+        age: meta.age,
+        objective: meta.objective || "",
+      }).eq("user_id", data.user.id);
     }
 
     return { error };
