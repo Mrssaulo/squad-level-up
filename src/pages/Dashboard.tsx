@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
-import { Activity, Timer, Shield, Trophy, Flame, LogOut } from "lucide-react";
+import { Activity, Timer, Shield, Trophy, Flame, LogOut, Brain, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
 import { cn } from "@/lib/utils";
@@ -37,6 +38,8 @@ const Dashboard = () => {
   const { user, signOut, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [completedCount, setCompletedCount] = useState(0);
+  const [aiSuggestion, setAiSuggestion] = useState<{ title: string; description: string; exercises: any[] } | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -55,6 +58,21 @@ const Dashboard = () => {
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id);
       setCompletedCount(count || 0);
+
+      // AI daily suggestion
+      if (data) {
+        setAiLoading(true);
+        try {
+          const result = await callAI(
+            [{ role: "user", content: "Sugira o melhor treino para hoje." }],
+            "daily-suggestion",
+            { position: data.position, level: data.level, trainingsThisWeek: data.trainings_this_week, physicalLevel: data.physical_level, totalTrainings: data.total_trainings }
+          );
+          const parsed = JSON.parse(result);
+          setAiSuggestion(parsed);
+        } catch { /* silent fail for suggestion */ }
+        setAiLoading(false);
+      }
     };
     fetchData();
   }, [user, authLoading, navigate]);
@@ -112,12 +130,27 @@ const Dashboard = () => {
       <div className="px-4 -mt-4 space-y-4 max-w-md mx-auto">
         <div className="gradient-card rounded-xl p-5 border border-border/30 animate-slide-up" style={{ animationDelay: "0.1s" }}>
           <div className="flex items-center gap-2 mb-3">
-            <Flame className="w-5 h-5 text-highlight" />
-            <h3 className="font-heading text-base font-bold">Treino de hoje</h3>
+            {aiLoading ? <Loader2 className="w-5 h-5 text-primary animate-spin" /> : <Brain className="w-5 h-5 text-primary" />}
+            <h3 className="font-heading text-base font-bold">
+              {aiSuggestion ? "🧠 Treino sugerido pela IA" : "Treino de hoje"}
+            </h3>
           </div>
-          <p className="text-sm text-muted-foreground mb-4">
-            Força e resistência — {profile.position === "Goleiro" ? "reflexos e explosão" : "condicionamento e potência"}
+          <p className="text-sm text-muted-foreground mb-2">
+            {aiSuggestion ? aiSuggestion.title : `Força e resistência — ${profile.position === "Goleiro" ? "reflexos e explosão" : "condicionamento e potência"}`}
           </p>
+          {aiSuggestion && (
+            <p className="text-xs text-muted-foreground mb-3">{aiSuggestion.description}</p>
+          )}
+          {aiSuggestion?.exercises && (
+            <div className="space-y-1.5 mb-4">
+              {aiSuggestion.exercises.slice(0, 4).map((ex: any, i: number) => (
+                <div key={i} className="flex items-center justify-between text-xs bg-muted/30 rounded-lg px-3 py-1.5">
+                  <span className="text-foreground font-medium">{ex.name}</span>
+                  <span className="text-muted-foreground">{ex.sets}x{ex.reps}</span>
+                </div>
+              ))}
+            </div>
+          )}
           <Button
             onClick={handleStartTraining}
             className="w-full h-12 font-heading font-bold bg-primary hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-[0.98]"

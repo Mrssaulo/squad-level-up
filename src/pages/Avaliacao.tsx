@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getDetailedAssessment } from "@/lib/trainings";
+import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Activity, Shield, TrendingUp, TrendingDown, Zap, CheckCircle } from "lucide-react";
+import { Activity, Shield, TrendingUp, TrendingDown, Zap, CheckCircle, Brain, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -60,6 +61,8 @@ const Avaliacao = () => {
     recommendation: string;
   } | null>(null);
   const [position, setPosition] = useState("");
+  const [aiAnalysis, setAiAnalysis] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -89,6 +92,24 @@ const Avaliacao = () => {
     const category = determineCategory(imc, f, r);
     const detailed = getDetailedAssessment(position, category, imc, f, r);
     setResult({ imc, category, ...detailed });
+    setAiAnalysis("");
+  };
+
+  const handleAIAnalysis = async () => {
+    if (!result) return;
+    setAiLoading(true);
+    try {
+      const analysis = await callAI(
+        [{ role: "user", content: "Analise minha avaliação física e me dê um diagnóstico completo." }],
+        "assessment-analysis",
+        { position, imc: result.imc, category: result.category, conditioningLevel: result.conditioningLevel, fatPercentage: parseFloat(fat), run12min: parseFloat(run12), sprint30m: parseFloat(sprint30) }
+      );
+      setAiAnalysis(analysis);
+    } catch (e: any) {
+      toast.error(e.message || "Erro na análise IA");
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   const handleSave = async () => {
@@ -213,6 +234,27 @@ const Avaliacao = () => {
               <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Recomendação para {position}</p>
               <p className="text-sm font-medium text-foreground">{result.recommendation}</p>
             </div>
+
+            {/* AI Analysis */}
+            {!aiAnalysis && (
+              <Button
+                onClick={handleAIAnalysis}
+                disabled={aiLoading}
+                className="w-full h-12 font-heading font-bold bg-accent hover:bg-accent/90 transition-all hover:scale-[1.02]"
+              >
+                {aiLoading ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Analisando...</> : <><Brain className="w-5 h-5 mr-2" /> 🧠 Diagnóstico IA</>}
+              </Button>
+            )}
+
+            {aiAnalysis && (
+              <div className="gradient-card rounded-xl p-5 border border-border/20 animate-scale-in">
+                <div className="flex items-center gap-2 mb-3">
+                  <Brain className="w-4 h-4 text-accent" />
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Diagnóstico IA</p>
+                </div>
+                <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{aiAnalysis}</div>
+              </div>
+            )}
 
             <Button
               onClick={handleSave}

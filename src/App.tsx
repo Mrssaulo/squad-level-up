@@ -9,6 +9,8 @@ import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import Treinos from "./pages/Treinos";
 import Avaliacao from "./pages/Avaliacao";
+import PersonalTrainer from "./pages/PersonalTrainer";
+import FloatingChat from "./components/FloatingChat";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,8 +28,10 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/treinos" element={<Treinos />} />
             <Route path="/avaliacao" element={<Avaliacao />} />
+            <Route path="/personal" element={<PersonalTrainer />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <FloatingChat />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
