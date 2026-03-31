@@ -58,6 +58,21 @@ const Dashboard = () => {
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id);
       setCompletedCount(count || 0);
+
+      // AI daily suggestion
+      if (data) {
+        setAiLoading(true);
+        try {
+          const result = await callAI(
+            [{ role: "user", content: "Sugira o melhor treino para hoje." }],
+            "daily-suggestion",
+            { position: data.position, level: data.level, trainingsThisWeek: data.trainings_this_week, physicalLevel: data.physical_level, totalTrainings: data.total_trainings }
+          );
+          const parsed = JSON.parse(result);
+          setAiSuggestion(parsed);
+        } catch { /* silent fail for suggestion */ }
+        setAiLoading(false);
+      }
     };
     fetchData();
   }, [user, authLoading, navigate]);
