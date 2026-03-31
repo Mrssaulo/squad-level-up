@@ -235,6 +235,27 @@ const Avaliacao = () => {
               <p className="text-sm font-medium text-foreground">{result.recommendation}</p>
             </div>
 
+            {/* AI Analysis */}
+            {!aiAnalysis && (
+              <Button
+                onClick={handleAIAnalysis}
+                disabled={aiLoading}
+                className="w-full h-12 font-heading font-bold bg-accent hover:bg-accent/90 transition-all hover:scale-[1.02]"
+              >
+                {aiLoading ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Analisando...</> : <><Brain className="w-5 h-5 mr-2" /> 🧠 Diagnóstico IA</>}
+              </Button>
+            )}
+
+            {aiAnalysis && (
+              <div className="gradient-card rounded-xl p-5 border border-border/20 animate-scale-in">
+                <div className="flex items-center gap-2 mb-3">
+                  <Brain className="w-4 h-4 text-accent" />
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Diagnóstico IA</p>
+                </div>
+                <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{aiAnalysis}</div>
+              </div>
+            )}
+
             <Button
               onClick={handleSave}
               className="w-full h-12 font-heading font-bold bg-highlight hover:bg-highlight/90 transition-all hover:scale-[1.02]"
