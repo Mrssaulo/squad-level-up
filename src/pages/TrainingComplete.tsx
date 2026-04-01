@@ -46,13 +46,13 @@ const TrainingComplete = () => {
     const saveAndGenerateMessage = async () => {
       setSaving(true);
       try {
-        const { error } = await supabase.from("training_sessions").insert({
+        const { error } = await supabase.from("training_sessions").insert([{
           user_id: user.id,
           session_name: training.title,
           position,
           exercises_count: training.exercises.length,
-          exercises_data: training.exercises,
-        });
+          exercises_data: training.exercises as any,
+        }]);
 
         if (error) {
           console.error("Error saving training session:", error);
