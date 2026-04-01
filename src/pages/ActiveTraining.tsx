@@ -27,6 +27,7 @@ const ActiveTraining = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [training, setTraining] = useState<TrainingData | null>(null);
   const [position, setPosition] = useState("");
+  const [scheduledId, setScheduledId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -36,14 +37,16 @@ const ActiveTraining = () => {
 
     const trainingData = location.state?.training as TrainingData | undefined;
     const userPosition = location.state?.position as string | undefined;
+    const sId = location.state?.scheduledId as string | undefined;
 
-    if (!trainingData || !userPosition) {
+    if (!trainingData) {
       navigate("/dashboard");
       return;
     }
 
     setTraining(trainingData);
-    setPosition(userPosition);
+    setPosition(userPosition || "");
+    setScheduledId(sId || null);
   }, [user, location.state, navigate]);
 
   if (!training) {
@@ -58,8 +61,16 @@ const ActiveTraining = () => {
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === training.exercises.length - 1;
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (isLast) {
+      // Mark scheduled training as completed if from calendar
+      if (scheduledId) {
+        await supabase
+          .from("scheduled_trainings")
+          .update({ status: "completed" })
+          .eq("id", scheduledId);
+      }
+
       navigate("/training-complete", {
         state: {
           training,
@@ -104,7 +115,7 @@ const ActiveTraining = () => {
                     key={i}
                     className={cn(
                       "w-2 h-2 rounded-full transition-colors",
-                      i === currentIndex ? "bg-primary" : "bg-muted"
+                      i === currentIndex ? "bg-primary" : i < currentIndex ? "bg-primary/40" : "bg-muted"
                     )}
                   />
                 ))}
