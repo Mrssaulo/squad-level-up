@@ -121,34 +121,34 @@ export type Database = {
       }
       training_sessions: {
         Row: {
-          id: string
-          user_id: string
-          session_name: string
-          position: string
-          exercises_count: number
-          exercises_data: Json
           completed_at: string
           created_at: string
+          exercises_count: number
+          exercises_data: Json
+          id: string
+          position: string
+          session_name: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          session_name?: string
-          position: string
-          exercises_count?: number
-          exercises_data?: Json
           completed_at?: string
           created_at?: string
+          exercises_count?: number
+          exercises_data?: Json
+          id?: string
+          position?: string
+          session_name?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          session_name?: string
-          position?: string
-          exercises_count?: number
-          exercises_data?: Json
           completed_at?: string
           created_at?: string
+          exercises_count?: number
+          exercises_data?: Json
+          id?: string
+          position?: string
+          session_name?: string
+          user_id?: string
         }
         Relationships: []
       }

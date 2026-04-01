@@ -48,7 +48,7 @@ const Historico = () => {
       if (error) {
         console.error("Error fetching training sessions:", error);
       } else {
-        setSessions(data || []);
+        setSessions((data || []).map((d: any) => ({ ...d, exercises_data: d.exercises_data as Exercise[] })));
       }
       setLoading(false);
     };
