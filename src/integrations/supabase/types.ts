@@ -119,6 +119,39 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_trainings: {
+        Row: {
+          created_at: string
+          exercises_data: Json
+          id: string
+          scheduled_date: string
+          status: string
+          training_description: string
+          training_title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          exercises_data?: Json
+          id?: string
+          scheduled_date: string
+          status?: string
+          training_description?: string
+          training_title?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          exercises_data?: Json
+          id?: string
+          scheduled_date?: string
+          status?: string
+          training_description?: string
+          training_title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       training_sessions: {
         Row: {
           completed_at: string
