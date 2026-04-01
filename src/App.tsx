@@ -36,6 +36,7 @@ const App = () => (
             <Route path="/active-training" element={<ActiveTraining />} />
             <Route path="/training-complete" element={<TrainingComplete />} />
             <Route path="/historico" element={<Historico />} />
+            <Route path="/calendario" element={<Calendario />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <FloatingChat />
