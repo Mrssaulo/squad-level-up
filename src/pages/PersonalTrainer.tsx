@@ -5,13 +5,34 @@ import { supabase } from "@/integrations/supabase/client";
 import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
 import { Button } from "@/components/ui/button";
-import { Brain, Loader2, Dumbbell, Calendar } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Brain, Loader2, Dumbbell, CalendarPlus, Check } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 const positions = ["Goleiro", "Zagueiro", "Lateral", "Volante", "Meia", "Atacante"];
 const objectives = ["Ganhar força", "Melhorar resistência", "Aumentar velocidade", "Perder gordura", "Prevenir lesões"];
 const levels = ["Iniciante", "Intermediário", "Avançado"];
+
+interface Exercise {
+  name: string;
+  sets: number;
+  reps: number;
+  rest: string;
+  instruction?: string;
+}
+
+interface DayPlan {
+  day: string;
+  exercises: Exercise[];
+}
 
 const PersonalTrainer = () => {
   const navigate = useNavigate();
@@ -19,8 +40,10 @@ const PersonalTrainer = () => {
   const [position, setPosition] = useState("");
   const [objective, setObjective] = useState("");
   const [level, setLevel] = useState("");
-  const [plan, setPlan] = useState("");
+  const [plan, setPlan] = useState<DayPlan[]>([]);
+  const [rawPlan, setRawPlan] = useState("");
   const [loading, setLoading] = useState(false);
+  const [scheduledDays, setScheduledDays] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (authLoading) return;
@@ -42,18 +65,51 @@ const PersonalTrainer = () => {
       return;
     }
     setLoading(true);
-    setPlan("");
+    setPlan([]);
+    setRawPlan("");
+    setScheduledDays(new Set());
     try {
       const result = await callAI(
-        [{ role: "user", content: `Monte um plano de treino semanal completo para mim.` }],
+        [{ role: "user", content: `Monte um plano de treino semanal completo para mim. Responda em formato JSON com a estrutura: { "days": [{ "day": "Segunda", "exercises": [{ "name": "...", "sets": 3, "reps": 12, "rest": "60s", "instruction": "..." }] }] }. Apenas JSON, sem texto adicional.` }],
         "training-plan",
         { position, objective, level }
       );
-      setPlan(result);
+
+      try {
+        const cleanResult = result.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+        const parsed = JSON.parse(cleanResult);
+        if (parsed.days && Array.isArray(parsed.days)) {
+          setPlan(parsed.days);
+        } else {
+          setRawPlan(result);
+        }
+      } catch {
+        setRawPlan(result);
+      }
     } catch (e: any) {
       toast.error(e.message || "Erro ao gerar plano");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSchedule = async (dayPlan: DayPlan, date: Date) => {
+    if (!user) return;
+    const dateStr = format(date, "yyyy-MM-dd");
+
+    const { error } = await supabase.from("scheduled_trainings").insert([{
+      user_id: user.id,
+      scheduled_date: dateStr,
+      training_title: `${dayPlan.day} — ${position}`,
+      training_description: `${objective} • ${level}`,
+      exercises_data: dayPlan.exercises as any,
+    }]);
+
+    if (error) {
+      toast.error("Erro ao agendar treino");
+    } else {
+      toast.success(`Treino agendado para ${format(date, "dd/MM")}`);
+      setScheduledDays((prev) => new Set([...prev, dayPlan.day]));
     }
   };
 
@@ -65,7 +121,7 @@ const PersonalTrainer = () => {
           <h1 className="font-heading text-xl font-bold">Personal Trainer IA</h1>
         </div>
 
-        {!plan && (
+        {plan.length === 0 && !rawPlan && (
           <div className="space-y-4 animate-slide-up">
             <ChipSelector label="Posição" options={positions} selected={position} onSelect={setPosition} />
             <ChipSelector label="Objetivo" options={objectives} selected={objective} onSelect={setObjective} />
@@ -81,26 +137,58 @@ const PersonalTrainer = () => {
           </div>
         )}
 
-        {plan && (
+        {rawPlan && (
           <div className="animate-scale-in space-y-4">
             <div className="gradient-card rounded-xl p-5 border border-border/20">
-              <div className="flex items-center gap-2 mb-3">
-                <Calendar className="w-5 h-5 text-highlight" />
-                <h2 className="font-heading text-base font-bold">Seu Plano Semanal</h2>
-              </div>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/20 text-primary">{position}</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-highlight/20 text-highlight">{objective}</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{level}</span>
-              </div>
-              <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{plan}</div>
+              <h2 className="font-heading text-base font-bold mb-3">Seu Plano Semanal</h2>
+              <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{rawPlan}</div>
+            </div>
+            <Button onClick={() => { setRawPlan(""); setPlan([]); }} variant="outline" className="w-full h-11 font-heading font-bold">
+              <Dumbbell className="w-4 h-4 mr-2" /> Gerar novo plano
+            </Button>
+          </div>
+        )}
+
+        {plan.length > 0 && (
+          <div className="animate-scale-in space-y-4">
+            <div className="flex flex-wrap gap-2 mb-2">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/20 text-primary">{position}</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-highlight/20 text-highlight">{objective}</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{level}</span>
             </div>
 
-            <Button
-              onClick={() => setPlan("")}
-              variant="outline"
-              className="w-full h-11 font-heading font-bold"
-            >
+            {plan.map((dayPlan, di) => (
+              <div key={di} className="gradient-card rounded-xl p-4 border border-border/20 animate-slide-up" style={{ animationDelay: `${di * 0.05}s` }}>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-heading text-sm font-bold">{dayPlan.day}</h3>
+                  {scheduledDays.has(dayPlan.day) ? (
+                    <span className="flex items-center gap-1 text-primary text-[10px] font-bold">
+                      <Check className="w-3.5 h-3.5" /> Agendado
+                    </span>
+                  ) : (
+                    <SchedulePopover dayPlan={dayPlan} onSchedule={handleSchedule} />
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  {dayPlan.exercises.map((ex, ei) => (
+                    <div key={ei} className="flex items-center justify-between text-xs bg-muted/30 rounded-lg px-3 py-2">
+                      <div className="flex-1 min-w-0">
+                        <span className="text-foreground font-medium block truncate">{ex.name}</span>
+                        {ex.instruction && (
+                          <span className="text-[10px] text-muted-foreground block truncate">{ex.instruction}</span>
+                        )}
+                      </div>
+                      <span className="text-muted-foreground ml-2 shrink-0">
+                        {ex.sets}x{ex.reps} • {ex.rest}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            <Button onClick={() => { setPlan([]); setRawPlan(""); setScheduledDays(new Set()); }} variant="outline" className="w-full h-11 font-heading font-bold">
               <Dumbbell className="w-4 h-4 mr-2" /> Gerar novo plano
             </Button>
           </div>
@@ -108,6 +196,35 @@ const PersonalTrainer = () => {
       </div>
       <BottomNav />
     </div>
+  );
+};
+
+const SchedulePopover = ({ dayPlan, onSchedule }: { dayPlan: DayPlan; onSchedule: (d: DayPlan, date: Date) => void }) => {
+  const [date, setDate] = useState<Date | undefined>();
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button className="flex items-center gap-1 text-highlight text-[10px] font-bold hover:text-highlight/80 transition-colors">
+          <CalendarPlus className="w-3.5 h-3.5" /> Agendar
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="end">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={(d) => {
+            if (d) {
+              setDate(d);
+              onSchedule(dayPlan, d);
+            }
+          }}
+          locale={ptBR}
+          disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+          className={cn("p-3 pointer-events-auto")}
+        />
+      </PopoverContent>
+    </Popover>
   );
 };
 

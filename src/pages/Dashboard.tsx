@@ -4,11 +4,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
-import { Activity, Timer, Shield, Trophy, Flame, LogOut, Brain, Loader as Loader2 } from "lucide-react";
+import { Activity, Timer, Shield, Trophy, LogOut, Brain, Loader2, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { format, startOfWeek, addDays, isSameDay } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface Profile {
   name: string;
@@ -27,12 +29,6 @@ const levelColors: Record<string, string> = {
   Estrela: "bg-highlight/20 text-highlight",
 };
 
-function calculateLevel(total: number) {
-  if (total >= 50) return "Estrela";
-  if (total >= 20) return "Titular";
-  return "Iniciante";
-}
-
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, signOut, loading: authLoading } = useAuth();
@@ -40,6 +36,7 @@ const Dashboard = () => {
   const [completedCount, setCompletedCount] = useState(0);
   const [aiSuggestion, setAiSuggestion] = useState<{ title: string; description: string; exercises: any[] } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [weekDays, setWeekDays] = useState<{ date: Date; hasTraining: boolean; label: string }[]>([]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -59,6 +56,29 @@ const Dashboard = () => {
         .eq("user_id", user.id);
       setCompletedCount(count || 0);
 
+      // Fetch week schedule
+      const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+      const weekEnd = addDays(weekStart, 6);
+      const { data: scheduled } = await supabase
+        .from("scheduled_trainings")
+        .select("scheduled_date, status")
+        .eq("user_id", user.id)
+        .gte("scheduled_date", format(weekStart, "yyyy-MM-dd"))
+        .lte("scheduled_date", format(weekEnd, "yyyy-MM-dd"));
+
+      const days = Array.from({ length: 7 }, (_, i) => {
+        const date = addDays(weekStart, i);
+        const hasTraining = (scheduled || []).some(
+          (s: any) => isSameDay(new Date(s.scheduled_date + "T12:00:00"), date)
+        );
+        return {
+          date,
+          hasTraining,
+          label: format(date, "EEE", { locale: ptBR }).slice(0, 3),
+        };
+      });
+      setWeekDays(days);
+
       // AI daily suggestion
       if (data) {
         setAiLoading(true);
@@ -70,7 +90,7 @@ const Dashboard = () => {
           );
           const parsed = JSON.parse(result);
           setAiSuggestion(parsed);
-        } catch { /* silent fail for suggestion */ }
+        } catch { /* silent fail */ }
         setAiLoading(false);
       }
     };
@@ -123,6 +143,7 @@ const Dashboard = () => {
       </div>
 
       <div className="px-4 -mt-4 space-y-4 max-w-md mx-auto">
+        {/* AI Training Suggestion */}
         <div className="gradient-card rounded-xl p-5 border border-border/30 animate-slide-up" style={{ animationDelay: "0.1s" }}>
           <div className="flex items-center gap-2 mb-3">
             {aiLoading ? <Loader2 className="w-5 h-5 text-primary animate-spin" /> : <Brain className="w-5 h-5 text-primary" />}
@@ -154,6 +175,51 @@ const Dashboard = () => {
           </Button>
         </div>
 
+        {/* Week Summary */}
+        {weekDays.length > 0 && (
+          <div className="gradient-card rounded-xl p-4 border border-border/20 animate-slide-up" style={{ animationDelay: "0.15s" }}>
+            <div className="flex items-center gap-2 mb-3">
+              <CalendarDays className="w-4 h-4 text-highlight" />
+              <h3 className="font-heading text-sm font-bold">Semana</h3>
+            </div>
+            <div className="flex justify-between">
+              {weekDays.map(({ date, hasTraining, label }, i) => {
+                const isToday = isSameDay(date, new Date());
+                return (
+                  <button
+                    key={i}
+                    onClick={() => navigate("/calendario")}
+                    className="flex flex-col items-center gap-1"
+                  >
+                    <span className={cn(
+                      "text-[10px] font-medium uppercase",
+                      isToday ? "text-primary" : "text-muted-foreground"
+                    )}>
+                      {label}
+                    </span>
+                    <div className={cn(
+                      "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all",
+                      hasTraining && isToday
+                        ? "bg-primary text-primary-foreground"
+                        : hasTraining
+                        ? "bg-primary/20 text-primary"
+                        : isToday
+                        ? "border-2 border-primary text-primary"
+                        : "bg-muted/30 text-muted-foreground"
+                    )}>
+                      {format(date, "d")}
+                    </div>
+                    {hasTraining && (
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
           {[
             { icon: Activity, label: "Treinos semana", value: `${profile.trainings_this_week}/5`, color: "text-primary" },
@@ -172,6 +238,7 @@ const Dashboard = () => {
           ))}
         </div>
 
+        {/* Chart */}
         <div className="gradient-card rounded-xl p-4 border border-border/20 animate-slide-up" style={{ animationDelay: "0.5s" }}>
           <div className="flex items-center gap-2 mb-3">
             <Trophy className="w-4 h-4 text-highlight" />

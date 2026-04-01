@@ -34,7 +34,7 @@ serve(async (req) => {
     let systemPrompt = SYSTEM_PROMPT;
 
     if (type === "training-plan") {
-      systemPrompt += `\n\nO atleta está pedindo um plano de treino semanal personalizado. Contexto do atleta: ${JSON.stringify(context)}. Monte um plano detalhado de segunda a sábado com exercícios específicos, séries, repetições e tempos de descanso. Organize por dia da semana.`;
+      systemPrompt += `\n\nO atleta está pedindo um plano de treino semanal personalizado. Contexto do atleta: ${JSON.stringify(context)}. Monte um plano detalhado de segunda a sábado. Responda APENAS em formato JSON com a estrutura: { "days": [{ "day": "Segunda", "exercises": [{ "name": "...", "sets": 3, "reps": 12, "rest": "60s", "instruction": "..." }] }] }. Sem texto adicional, apenas JSON.`;
     } else if (type === "assessment-analysis") {
       systemPrompt += `\n\nO atleta acabou de fazer uma avaliação física. Dados: ${JSON.stringify(context)}. Faça um diagnóstico completo com: 1) Análise geral do condicionamento 2) Pontos fortes detalhados 3) Pontos fracos e riscos 4) Plano de evolução com metas de curto e médio prazo 5) Recomendações nutricionais.`;
     } else if (type === "daily-suggestion") {
