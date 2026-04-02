@@ -102,7 +102,10 @@ const Dashboard = () => {
       const weekEnd = addDays(weekStart, 6);
       const { data: scheduled } = await supabase
         .from("scheduled_trainings")
-        .select("scheduled_date, status")
+        .select("id, scheduled_date, status, training_title")
+        .eq("user_id", user.id)
+        .gte("scheduled_date", format(weekStart, "yyyy-MM-dd"))
+        .lte("scheduled_date", format(weekEnd, "yyyy-MM-dd"));
         .eq("user_id", user.id)
         .gte("scheduled_date", format(weekStart, "yyyy-MM-dd"))
         .lte("scheduled_date", format(weekEnd, "yyyy-MM-dd"));
