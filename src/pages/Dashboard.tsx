@@ -124,16 +124,17 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20 page-enter">
-      <div className="gradient-field px-4 pt-6 pb-8">
-        <div className="flex items-center gap-3 animate-fade-in">
-          <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center text-2xl border-2 border-primary/50">
+      <div className="gradient-header relative overflow-hidden px-4 pt-6 pb-10">
+        <div className="gradient-header-accent absolute inset-0 pointer-events-none" />
+        <div className="relative flex items-center gap-3 animate-fade-in">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-2xl border border-primary/30 shadow-lg shadow-primary/10">
             ⚽
           </div>
           <div className="flex-1">
-            <h2 className="font-heading text-lg font-bold text-foreground">{profile.name}</h2>
+            <h2 className="font-heading text-xl font-extrabold text-foreground tracking-tight">{profile.name}</h2>
             <p className="text-sm text-muted-foreground">{profile.position} • {profile.age} anos</p>
           </div>
-          <span className={cn("px-3 py-1 rounded-full text-xs font-bold", levelColors[profile.level] || levelColors.Iniciante)}>
+          <span className={cn("px-3 py-1 rounded-full text-xs font-bold border", levelColors[profile.level] || levelColors.Iniciante)}>
             {profile.level === "Estrela" && "⭐ "}{profile.level}
           </span>
           <button onClick={handleLogout} className="text-muted-foreground hover:text-foreground transition-colors">
