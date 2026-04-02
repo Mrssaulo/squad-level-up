@@ -73,13 +73,14 @@ export async function streamChat({
 
 // Daily message limit
 const DAILY_LIMIT_KEY = "ai_chat_daily";
+const FREE_DAILY_LIMIT = 1;
 
 export function canSendMessage(): boolean {
   const stored = localStorage.getItem(DAILY_LIMIT_KEY);
   if (!stored) return true;
   const { date, count } = JSON.parse(stored);
   if (date !== new Date().toDateString()) return true;
-  return count < 3;
+  return count < FREE_DAILY_LIMIT;
 }
 
 export function recordMessage() {
@@ -96,8 +97,8 @@ export function recordMessage() {
 
 export function getRemainingMessages(): number {
   const stored = localStorage.getItem(DAILY_LIMIT_KEY);
-  if (!stored) return 3;
+  if (!stored) return FREE_DAILY_LIMIT;
   const { date, count } = JSON.parse(stored);
-  if (date !== new Date().toDateString()) return 3;
-  return Math.max(0, 3 - count);
+  if (date !== new Date().toDateString()) return FREE_DAILY_LIMIT;
+  return Math.max(0, FREE_DAILY_LIMIT - count);
 }
