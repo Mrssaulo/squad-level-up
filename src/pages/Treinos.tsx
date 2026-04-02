@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { trainings, positionFilters, type Training } from "@/lib/trainings";
+import { trainings, positionFilters, spaceLabels, materialLabels, locationLabels, type Training } from "@/lib/trainings";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, Check, User, Play, Dumbbell } from "lucide-react";
+import { Search, Plus, Check, User, Play, Dumbbell, MapPin, Package, Clock, Maximize, ChevronDown, ChevronUp, Lightbulb, Wrench } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -58,6 +58,21 @@ const Treinos = () => {
     toast.success(`"${training.title}" adicionado à rotina.`);
   };
 
+  const startTraining = (training: Training) => {
+    const trainingData = {
+      title: training.title,
+      description: training.description,
+      exercises: training.exercises.map(ex => ({
+        name: ex.name,
+        sets: ex.sets,
+        reps: typeof ex.reps === 'string' && ex.reps.match(/^\d+$/) ? parseInt(ex.reps) : 10,
+        rest: ex.rest,
+        instruction: ex.instruction,
+      })),
+    };
+    navigate("/active-training", { state: { training: trainingData, position: userPosition } });
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20 page-enter">
       {/* Header */}
@@ -66,7 +81,7 @@ const Treinos = () => {
         <div className="relative max-w-md mx-auto">
           <div className="mb-4 animate-fade-in">
             <h1 className="page-title text-foreground mb-1">Biblioteca de treinos</h1>
-            <p className="text-xs text-muted-foreground">Encontre treinos mais coerentes com sua posição, seu objetivo e sua rotina.</p>
+            <p className="text-xs text-muted-foreground">Treinos que você executa sozinho, com clareza e autonomia.</p>
           </div>
 
           <div className="relative mb-4 animate-fade-in">
@@ -116,51 +131,135 @@ const Treinos = () => {
           return (
             <div
               key={training.id}
-              className="premium-card rounded-2xl overflow-hidden transition-all duration-300 animate-slide-up cursor-pointer"
+              className="premium-card rounded-2xl overflow-hidden transition-all duration-300 animate-slide-up"
               style={{ animationDelay: `${i * 0.05}s` }}
-              onClick={() => setExpanded(isExpanded ? null : training.id)}
             >
-              <div className="p-4 flex items-center gap-3">
-                <span className="text-2xl">{training.thumbnail}</span>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-heading text-sm font-bold truncate">{training.title}</h3>
-                  <p className="text-xs text-muted-foreground">{training.duration}</p>
-                </div>
-                <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold", difficultyColors[training.difficulty])}>
-                  {training.difficulty}
-                </span>
-              </div>
-              {isExpanded && (
-                <div className="px-4 pb-4 animate-fade-in">
-                  {training.demoUrl && (
-                    <div className="mb-3 rounded-xl overflow-hidden bg-surface-2 border border-border/10">
-                      {training.demoType === "video" ? (
-                        <video src={training.demoUrl} controls loop muted playsInline className="w-full aspect-video object-cover" />
-                      ) : (
-                        <div className="relative">
-                          <img src={training.demoUrl} alt={`Demo: ${training.title}`} className="w-full aspect-video object-cover" loading="lazy" />
-                          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-background/80 backdrop-blur-sm rounded-full px-2 py-0.5">
-                            <Play className="w-3 h-3 text-primary fill-primary" />
-                            <span className="text-[10px] font-semibold text-foreground">Demonstração</span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  <p className="text-sm text-muted-foreground mb-2">{training.description}</p>
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {training.positions.map((pos) => (
-                      <span key={pos} className="text-[10px] px-2 py-0.5 rounded-full bg-surface-2 text-muted-foreground">{pos}</span>
-                    ))}
+              {/* Card header - always visible */}
+              <div
+                className="p-4 cursor-pointer"
+                onClick={() => setExpanded(isExpanded ? null : training.id)}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl">{training.thumbnail}</span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-heading text-sm font-bold truncate">{training.title}</h3>
+                    <p className="text-[11px] text-muted-foreground">{training.focus}</p>
                   </div>
-                  <Button
-                    size="sm"
-                    onClick={(e) => { e.stopPropagation(); addToPlan(training); }}
-                    className={cn("w-full font-semibold transition-all hover:scale-[1.02]", inPlan ? "bg-muted text-muted-foreground" : "")}
-                    disabled={inPlan}
-                  >
-                    {inPlan ? <><Check className="w-4 h-4 mr-1" /> Na rotina</> : <><Plus className="w-4 h-4 mr-1" /> Adicionar ao plano</>}
-                  </Button>
+                  <div className="flex flex-col items-end gap-1">
+                    <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold", difficultyColors[training.difficulty])}>
+                      {training.difficulty}
+                    </span>
+                    {isExpanded
+                      ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
+                      : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+                    }
+                  </div>
+                </div>
+
+                {/* Quick info badges */}
+                <div className="flex flex-wrap gap-1.5">
+                  <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
+                    <User className="w-2.5 h-2.5" /> Solo
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-surface-2 text-muted-foreground">
+                    <Clock className="w-2.5 h-2.5" /> {training.duration}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-surface-2 text-muted-foreground">
+                    <Maximize className="w-2.5 h-2.5" /> {spaceLabels[training.spaceRequired]}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-surface-2 text-muted-foreground">
+                    <Package className="w-2.5 h-2.5" /> {training.material.map(m => materialLabels[m]).join(", ")}
+                  </span>
+                </div>
+              </div>
+
+              {/* Expanded content */}
+              {isExpanded && (
+                <div className="px-4 pb-4 animate-fade-in border-t border-border/10 pt-3">
+                  {/* Objective */}
+                  <div className="mb-3">
+                    <p className="text-[11px] font-semibold text-primary uppercase tracking-wider mb-1">Objetivo do treino</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{training.description}</p>
+                  </div>
+
+                  {/* Location & Position */}
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    <div className="bg-surface-2 rounded-lg p-2.5">
+                      <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1"><MapPin className="w-2.5 h-2.5" /> Local ideal</p>
+                      <p className="text-xs font-medium text-foreground">{training.locations.map(l => locationLabels[l]).join(" · ")}</p>
+                    </div>
+                    <div className="bg-surface-2 rounded-lg p-2.5">
+                      <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1"><User className="w-2.5 h-2.5" /> Posições</p>
+                      <p className="text-xs font-medium text-foreground">{training.positions.length === 7 ? "Todas" : training.positions.join(", ")}</p>
+                    </div>
+                  </div>
+
+                  {/* Material */}
+                  <div className="bg-surface-2 rounded-lg p-2.5 mb-3">
+                    <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1"><Package className="w-2.5 h-2.5" /> Você vai precisar de</p>
+                    <p className="text-xs font-medium text-foreground">
+                      {training.material.includes("nenhum") ? "Nada — apenas seu corpo." : training.material.map(m => materialLabels[m]).join(", ")}
+                    </p>
+                  </div>
+
+                  {/* Exercises list */}
+                  <div className="mb-3">
+                    <p className="text-[11px] font-semibold text-primary uppercase tracking-wider mb-2">Como executar</p>
+                    <div className="space-y-2">
+                      {training.exercises.map((ex, idx) => (
+                        <div key={idx} className="bg-surface-2 rounded-lg p-3">
+                          <div className="flex items-start justify-between mb-1">
+                            <div className="flex items-center gap-2">
+                              <span className="w-5 h-5 rounded-full bg-primary/15 text-primary text-[10px] font-bold flex items-center justify-center flex-shrink-0">{idx + 1}</span>
+                              <span className="text-xs font-semibold text-foreground">{ex.name}</span>
+                            </div>
+                            <span className="text-[10px] text-muted-foreground whitespace-nowrap ml-2">{ex.sets}x{ex.reps} · {ex.rest === "—" ? "sem descanso" : ex.rest}</span>
+                          </div>
+                          <p className="text-[11px] text-muted-foreground leading-relaxed ml-7">{ex.instruction}</p>
+                          {ex.adaptation && (
+                            <p className="text-[11px] text-accent ml-7 mt-1 flex items-start gap-1">
+                              <Wrench className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                              {ex.adaptation}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Adaptation note */}
+                  <div className="bg-accent/10 border border-accent/20 rounded-lg p-3 mb-3">
+                    <p className="text-[11px] font-semibold text-accent mb-1 flex items-center gap-1">
+                      <Lightbulb className="w-3 h-3" /> Se estiver com pouco espaço ou material
+                    </p>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">{training.adaptationNote}</p>
+                  </div>
+
+                  {/* Practical tip */}
+                  <div className="bg-primary/5 border border-primary/10 rounded-lg p-3 mb-4">
+                    <p className="text-[11px] font-semibold text-primary mb-1">Dica prática</p>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">{training.practicalTip}</p>
+                  </div>
+
+                  {/* Action buttons */}
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => { e.stopPropagation(); startTraining(training); }}
+                      className="flex-1 font-semibold transition-all hover:scale-[1.02]"
+                    >
+                      <Play className="w-4 h-4 mr-1" /> Iniciar agora
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={(e) => { e.stopPropagation(); addToPlan(training); }}
+                      className={cn("flex-1 font-semibold transition-all hover:scale-[1.02]", inPlan ? "bg-muted text-muted-foreground" : "")}
+                      disabled={inPlan}
+                    >
+                      {inPlan ? <><Check className="w-4 h-4 mr-1" /> Na rotina</> : <><Plus className="w-4 h-4 mr-1" /> Adicionar</>}
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
