@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
 import OnboardingTour, { type TourStep } from "@/components/OnboardingTour";
-import { Activity, Timer, Shield, Trophy, LogOut, Brain, Loader2, CalendarDays, Flame } from "lucide-react";
+import { Activity, Timer, Shield, Trophy, LogOut, Brain, Loader2, CalendarDays, Flame, Eye, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
 import { cn } from "@/lib/utils";
