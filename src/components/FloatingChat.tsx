@@ -52,6 +52,9 @@ function parseSuggestions(content: string): { cleanContent: string; suggestions:
 
 const FloatingChat = () => {
   const { user } = useAuth();
+  const location = window.location.pathname;
+  const publicRoutes = ["/", "/login", "/reset-password"];
+  const isPublicRoute = publicRoutes.includes(location);
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<ViewMode>("chat");
   const [messages, setMessages] = useState<Msg[]>([]);
