@@ -119,19 +119,28 @@ const Dashboard = () => {
       });
       setWeekDays(days);
 
-      // AI daily suggestion
+      // AI daily suggestion (cached for the day)
       if (data) {
-        setAiLoading(true);
-        try {
-          const result = await callAI(
-            [{ role: "user", content: "Sugira o melhor treino para hoje." }],
-            "daily-suggestion",
-            { position: data.position, level: data.level, trainingsThisWeek: data.trainings_this_week, physicalLevel: data.physical_level, totalTrainings: data.total_trainings }
-          );
-          const parsed = JSON.parse(result);
-          setAiSuggestion(parsed);
-        } catch { /* silent fail */ }
-        setAiLoading(false);
+        const cacheKey = `daily_suggestion_${new Date().toDateString()}`;
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          try {
+            setAiSuggestion(JSON.parse(cached));
+          } catch { /* ignore */ }
+        } else {
+          setAiLoading(true);
+          try {
+            const result = await callAI(
+              [{ role: "user", content: "Sugira o melhor treino para hoje." }],
+              "daily-suggestion",
+              { position: data.position, level: data.level, trainingsThisWeek: data.trainings_this_week, physicalLevel: data.physical_level, totalTrainings: data.total_trainings }
+            );
+            const parsed = JSON.parse(result);
+            setAiSuggestion(parsed);
+            localStorage.setItem(cacheKey, JSON.stringify(parsed));
+          } catch { /* silent fail */ }
+          setAiLoading(false);
+        }
       }
     };
     fetchData();
