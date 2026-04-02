@@ -20,7 +20,7 @@ const pillars = [
   {
     icon: Lightbulb,
     title: "Apoio inteligente",
-    desc: "Use a IA como suporte para orientar decisões, tirar dúvidas e ajustar foco.",
+    desc: "Receba orientação complementar para ajustar foco, rotina e entendimento.",
   },
 ];
 
