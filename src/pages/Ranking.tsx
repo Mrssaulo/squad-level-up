@@ -37,9 +37,9 @@ function getRankIcon(index: number) {
 }
 
 function getRankBg(index: number) {
-  if (index === 0) return "bg-yellow-400/10 border-yellow-400/30";
-  if (index === 1) return "bg-gray-300/10 border-gray-300/30";
-  if (index === 2) return "bg-amber-600/10 border-amber-600/30";
+  if (index === 0) return "bg-primary/10 border-primary/30";
+  if (index === 1) return "bg-muted/30 border-muted-foreground/20";
+  if (index === 2) return "bg-accent/20 border-accent/30";
   return "bg-muted/20 border-border/20";
 }
 
