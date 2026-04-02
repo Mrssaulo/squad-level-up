@@ -3,11 +3,11 @@ import { Home, Dumbbell, User, Brain, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { path: "/dashboard", label: "Início", icon: Home },
-  { path: "/treinos", label: "Treinos", icon: Dumbbell },
-  { path: "/ranking", label: "Ranking", icon: Trophy },
-  { path: "/personal", label: "Coach IA", icon: Brain },
-  { path: "/avaliacao", label: "Perfil", icon: User },
+  { path: "/dashboard", label: "Início", icon: Home, tourId: "nav-home" },
+  { path: "/treinos", label: "Treinos", icon: Dumbbell, tourId: "nav-treinos" },
+  { path: "/ranking", label: "Ranking", icon: Trophy, tourId: "nav-ranking" },
+  { path: "/personal", label: "Coach IA", icon: Brain, tourId: "nav-coach" },
+  { path: "/avaliacao", label: "Perfil", icon: User, tourId: "nav-perfil" },
 ];
 
 const BottomNav = () => {
@@ -17,12 +17,13 @@ const BottomNav = () => {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-t border-border/30">
       <div className="flex items-center justify-around max-w-md mx-auto h-16">
-        {navItems.map(({ path, label, icon: Icon }) => {
+        {navItems.map(({ path, label, icon: Icon, tourId }) => {
           const active = location.pathname === path;
           return (
             <button
               key={path}
               onClick={() => navigate(path)}
+              data-tour={tourId}
               className={cn(
                 "flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all duration-200 relative",
                 active ? "text-primary" : "text-muted-foreground hover:text-foreground hover:scale-105"
