@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { callAI } from "@/lib/ai";
 import { Button } from "@/components/ui/button";
-import { Trophy, RefreshCw, Chrome as Home, Loader as Loader2 } from "lucide-react";
+import { Trophy, RefreshCw, Home, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Exercise {
