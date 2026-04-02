@@ -137,13 +137,42 @@ const Avaliacao = () => {
     : 25
     : 0;
 
+  const [isDark, setIsDark] = useState(() => !document.documentElement.classList.contains("light"));
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    if (next) {
+      document.documentElement.classList.remove("light");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.add("light");
+      localStorage.setItem("theme", "light");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="px-4 pt-6 max-w-md mx-auto">
-        <div className="flex items-center gap-2 mb-6 animate-fade-in">
-          <Shield className="w-6 h-6 text-primary" />
-          <h1 className="font-heading text-xl font-bold">Check-up do Atleta</h1>
+    <div className="min-h-screen bg-background pb-20 page-enter">
+      <div className="gradient-header relative overflow-hidden px-4 pt-6 pb-6">
+        <div className="gradient-header-accent absolute inset-0 pointer-events-none" />
+        <div className="relative max-w-md mx-auto">
+          <div className="flex items-center justify-between mb-6 animate-fade-in">
+            <div className="flex items-center gap-3">
+              <div className="icon-container">
+                <Shield className="w-5 h-5 text-primary" />
+              </div>
+              <h1 className="page-title text-foreground">Check-up</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <Sun className="w-4 h-4 text-muted-foreground" />
+              <Switch checked={isDark} onCheckedChange={toggleTheme} />
+              <Moon className="w-4 h-4 text-muted-foreground" />
+            </div>
+          </div>
         </div>
+      </div>
+
+      <div className="px-4 max-w-md mx-auto -mt-2">
 
         <div className="gradient-card rounded-xl p-5 border border-border/20 mb-4 animate-slide-up">
           <h2 className="font-heading text-base font-bold mb-4 flex items-center gap-2">
