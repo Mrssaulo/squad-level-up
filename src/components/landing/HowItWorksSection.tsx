@@ -23,7 +23,7 @@ const steps = [
   {
     icon: BarChart3,
     number: "04",
-    title: "Acompanhe sua evolução e mantenha consistência",
+    title: "Acompanhe sua evolução com mais consistência",
     desc: "Visualize seu progresso e transforme treino em processo contínuo.",
   },
 ];
