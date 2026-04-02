@@ -1,13 +1,13 @@
-import { useState, useCallback, lazy, Suspense } from "react";
+import { useState, useCallback, lazy, Suspense, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import SplashScreen from "./components/SplashScreen";
 
 const LandingPage = lazy(() => import("./pages/LandingPage"));
+const AuthShell = lazy(() => import("./components/AuthShell"));
 const Login = lazy(() => import("./pages/Login"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -21,7 +21,6 @@ const Calendario = lazy(() => import("./pages/Calendario"));
 const Ranking = lazy(() => import("./pages/Ranking"));
 const Admin = lazy(() => import("./pages/Admin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const FloatingChat = lazy(() => import("./components/FloatingChat"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,6 +58,12 @@ const SafePage = ({ children }: { children: React.ReactNode }) => (
   </ErrorBoundary>
 );
 
+const AuthenticatedPage = ({ children }: { children: ReactNode }) => (
+  <SafePage>
+    <AuthShell>{children}</AuthShell>
+  </SafePage>
+);
+
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
   const hideSplash = useCallback(() => setShowSplash(false), []);
@@ -70,32 +75,24 @@ const App = () => {
           <Sonner />
           {showSplash && <SplashScreen onFinish={hideSplash} />}
           <BrowserRouter>
-            <AuthProvider>
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
-                  <Route path="/" element={<SafePage><LandingPage /></SafePage>} />
-                  <Route path="/login" element={<SafePage><Login /></SafePage>} />
-                  <Route path="/reset-password" element={<SafePage><ResetPassword /></SafePage>} />
-                  <Route path="/dashboard" element={<SafePage><Dashboard /></SafePage>} />
-                  <Route path="/treinos" element={<SafePage><Treinos /></SafePage>} />
-                  <Route path="/avaliacao" element={<SafePage><Avaliacao /></SafePage>} />
-                  <Route path="/personal" element={<SafePage><PersonalTrainer /></SafePage>} />
-                  <Route path="/active-training" element={<SafePage><ActiveTraining /></SafePage>} />
-                  <Route path="/training-complete" element={<SafePage><TrainingComplete /></SafePage>} />
-                  <Route path="/historico" element={<SafePage><Historico /></SafePage>} />
-                  <Route path="/calendario" element={<SafePage><Calendario /></SafePage>} />
-                  <Route path="/ranking" element={<SafePage><Ranking /></SafePage>} />
-                  <Route path="/admin" element={<SafePage><Admin /></SafePage>} />
-                  <Route path="*" element={<SafePage><NotFound /></SafePage>} />
-                </Routes>
-              </Suspense>
-              {/* FloatingChat is non-essential — never blocks the app */}
-              <ErrorBoundary fallback={<></>}>
-                <Suspense fallback={null}>
-                  <FloatingChat />
-                </Suspense>
-              </ErrorBoundary>
-            </AuthProvider>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<SafePage><LandingPage /></SafePage>} />
+                <Route path="/login" element={<AuthenticatedPage><Login /></AuthenticatedPage>} />
+                <Route path="/reset-password" element={<AuthenticatedPage><ResetPassword /></AuthenticatedPage>} />
+                <Route path="/dashboard" element={<AuthenticatedPage><Dashboard /></AuthenticatedPage>} />
+                <Route path="/treinos" element={<AuthenticatedPage><Treinos /></AuthenticatedPage>} />
+                <Route path="/avaliacao" element={<AuthenticatedPage><Avaliacao /></AuthenticatedPage>} />
+                <Route path="/personal" element={<AuthenticatedPage><PersonalTrainer /></AuthenticatedPage>} />
+                <Route path="/active-training" element={<AuthenticatedPage><ActiveTraining /></AuthenticatedPage>} />
+                <Route path="/training-complete" element={<AuthenticatedPage><TrainingComplete /></AuthenticatedPage>} />
+                <Route path="/historico" element={<AuthenticatedPage><Historico /></AuthenticatedPage>} />
+                <Route path="/calendario" element={<AuthenticatedPage><Calendario /></AuthenticatedPage>} />
+                <Route path="/ranking" element={<AuthenticatedPage><Ranking /></AuthenticatedPage>} />
+                <Route path="/admin" element={<AuthenticatedPage><Admin /></AuthenticatedPage>} />
+                <Route path="*" element={<SafePage><NotFound /></SafePage>} />
+              </Routes>
+            </Suspense>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
