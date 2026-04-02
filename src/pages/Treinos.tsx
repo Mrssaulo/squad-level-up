@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, Check, User } from "lucide-react";
+import { Search, Plus, Check, User, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -158,6 +158,34 @@ const Treinos = () => {
               </div>
               {isExpanded && (
                 <div className="px-4 pb-4 animate-fade-in">
+                  {/* Demo media */}
+                  {training.demoUrl && (
+                    <div className="mb-3 rounded-xl overflow-hidden bg-muted/30 border border-border/10">
+                      {training.demoType === "video" ? (
+                        <video
+                          src={training.demoUrl}
+                          controls
+                          loop
+                          muted
+                          playsInline
+                          className="w-full aspect-video object-cover"
+                        />
+                      ) : (
+                        <div className="relative">
+                          <img
+                            src={training.demoUrl}
+                            alt={`Demo: ${training.title}`}
+                            className="w-full aspect-video object-cover"
+                            loading="lazy"
+                          />
+                          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-background/80 backdrop-blur-sm rounded-full px-2 py-0.5">
+                            <Play className="w-3 h-3 text-primary fill-primary" />
+                            <span className="text-[10px] font-semibold text-foreground">Demonstração</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   <p className="text-sm text-muted-foreground mb-2">{training.description}</p>
                   <div className="flex flex-wrap gap-1 mb-3">
                     {training.positions.map((pos) => (
