@@ -105,7 +105,7 @@ const Dashboard = () => {
           if (!isMounted) return;
           const parsed = JSON.parse(result);
           setAiSuggestion(parsed);
-          localStorage.setItem(cacheKey, JSON.stringify(parsed));
+          try { localStorage.setItem(cacheKey, JSON.stringify(parsed)); } catch { /* */ }
         } catch (error) { console.error("Error generating daily suggestion:", error); }
         finally { if (isMounted) setAiLoading(false); }
       } catch (error) {
