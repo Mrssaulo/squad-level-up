@@ -218,7 +218,7 @@ const Dashboard = () => {
 
   if (authLoading || profileLoading) return <DashboardSkeleton />;
   if (!profile) return <DashboardErrorState />;
-  })), [profile.physical_level]);
+  
 
   const handleStartTraining = () => {
     if (!aiSuggestion) {
