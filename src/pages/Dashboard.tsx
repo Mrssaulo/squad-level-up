@@ -266,7 +266,7 @@ const Dashboard = () => {
         )}
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-3" data-tour="stats">
           {[
             { icon: Activity, label: "Treinos semana", value: `${profile.trainings_this_week}/5`, color: "text-primary", containerClass: "icon-container" },
             { icon: Shield, label: "Nível físico", value: `${profile.physical_level}%`, color: "text-accent", containerClass: "icon-container-accent" },
