@@ -239,7 +239,7 @@ const Dashboard = () => {
         </div>
 
         {/* Chart */}
-        <div className="gradient-card rounded-xl p-4 border border-border/20 animate-slide-up" style={{ animationDelay: "0.5s" }}>
+        <div className="gradient-card rounded-xl p-4 border border-border/20 animate-slide-up card-hover" style={{ animationDelay: "0.5s" }}>
           <div className="flex items-center gap-2 mb-3">
             <Trophy className="w-4 h-4 text-highlight" />
             <h3 className="font-heading text-sm font-bold">Evolução — 30 dias</h3>

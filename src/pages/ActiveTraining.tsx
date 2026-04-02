@@ -104,7 +104,7 @@ const ActiveTraining = () => {
         </div>
 
         <div className="flex-1 px-4 -mt-4 max-w-md mx-auto w-full">
-          <div className="gradient-card rounded-xl p-6 border border-border/20 min-h-[400px] flex flex-col animate-scale-in">
+          <div key={currentIndex} className="gradient-card rounded-xl p-6 border border-border/20 min-h-[400px] flex flex-col animate-slide-in-right">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Exercício {currentIndex + 1} de {training.exercises.length}
