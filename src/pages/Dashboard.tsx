@@ -77,7 +77,7 @@ const Dashboard = () => {
   const [completedCount, setCompletedCount] = useState(0);
   const [aiSuggestion, setAiSuggestion] = useState<{ title: string; description: string; exercises: any[] } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
-  const [weekDays, setWeekDays] = useState<{ date: Date; hasTraining: boolean; label: string }[]>([]);
+  const [weekDays, setWeekDays] = useState<{ date: Date; hasTraining: boolean; label: string; trainingId?: string; trainingTitle?: string }[]>([]);
 
   useEffect(() => {
     if (authLoading) return;
