@@ -34,9 +34,9 @@ const QUICK_PROMPTS = [
 
 const FloatingChat = () => {
   const { user } = useAuth();
-  const location = window.location.pathname;
+  const pathname = typeof window !== "undefined" ? window.location.pathname : "/";
   const publicRoutes = ["/", "/login", "/reset-password"];
-  const isPublicRoute = publicRoutes.includes(location);
+  const isPublicRoute = publicRoutes.includes(pathname);
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<ViewMode>("chat");
   const [messages, setMessages] = useState<Msg[]>([]);

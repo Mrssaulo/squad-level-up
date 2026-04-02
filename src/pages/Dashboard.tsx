@@ -91,8 +91,9 @@ const Dashboard = () => {
         setWeekDays(days);
 
         const cacheKey = `daily_suggestion_${new Date().toDateString()}`;
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) { try { setAiSuggestion(JSON.parse(cached)); return; } catch { localStorage.removeItem(cacheKey); } }
+        let cached: string | null = null;
+        try { cached = localStorage.getItem(cacheKey); } catch { /* blocked */ }
+        if (cached) { try { setAiSuggestion(JSON.parse(cached)); return; } catch { try { localStorage.removeItem(cacheKey); } catch { /* */ } } }
 
         setAiLoading(true);
         try {
@@ -104,7 +105,7 @@ const Dashboard = () => {
           if (!isMounted) return;
           const parsed = JSON.parse(result);
           setAiSuggestion(parsed);
-          localStorage.setItem(cacheKey, JSON.stringify(parsed));
+          try { localStorage.setItem(cacheKey, JSON.stringify(parsed)); } catch { /* */ }
         } catch (error) { console.error("Error generating daily suggestion:", error); }
         finally { if (isMounted) setAiLoading(false); }
       } catch (error) {
