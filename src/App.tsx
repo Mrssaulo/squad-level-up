@@ -16,6 +16,7 @@ import ActiveTraining from "./pages/ActiveTraining";
 import TrainingComplete from "./pages/TrainingComplete";
 import Historico from "./pages/Historico";
 import Calendario from "./pages/Calendario";
+import Ranking from "./pages/Ranking";
 import FloatingChat from "./components/FloatingChat";
 import NotFound from "./pages/NotFound";
 
@@ -44,6 +45,7 @@ const App = () => {
               <Route path="/training-complete" element={<TrainingComplete />} />
               <Route path="/historico" element={<Historico />} />
               <Route path="/calendario" element={<Calendario />} />
+              <Route path="/ranking" element={<Ranking />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <FloatingChat />

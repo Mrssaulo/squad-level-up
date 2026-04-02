@@ -250,6 +250,42 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_rankings: {
+        Row: {
+          avatar_emoji: string
+          created_at: string
+          display_name: string
+          id: string
+          total_points: number
+          training_days: number
+          updated_at: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          avatar_emoji?: string
+          created_at?: string
+          display_name?: string
+          id?: string
+          total_points?: number
+          training_days?: number
+          updated_at?: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          avatar_emoji?: string
+          created_at?: string
+          display_name?: string
+          id?: string
+          total_points?: number
+          training_days?: number
+          updated_at?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
