@@ -6,8 +6,6 @@ import { Shield, Users, Crown, DollarSign, ArrowLeft } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-const ADMIN_EMAIL = "saulomoreira@admin.com";
-
 interface Stats {
   totalUsers: number;
   totalPremium: number;
