@@ -340,7 +340,7 @@ const FloatingChat = () => {
                           )}
                         >
                           {m.role === "assistant" ? (
-                            <div className="prose prose-sm prose-invert max-w-none [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5 [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_h1]:font-bold [&_h2]:font-bold [&_h3]:font-semibold [&_strong]:text-foreground">
+                            <div className={cn("prose prose-sm max-w-none [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5 [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_h1]:font-bold [&_h2]:font-bold [&_h3]:font-semibold [&_strong]:text-foreground", !document.documentElement.classList.contains("light") && "prose-invert")}>
                               <ReactMarkdown>{cleanContent}</ReactMarkdown>
                             </div>
                           ) : (
