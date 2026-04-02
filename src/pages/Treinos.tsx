@@ -190,6 +190,7 @@ const Treinos = () => {
                   <div className="flex flex-wrap gap-1 mb-3">
                     {training.positions.map((pos) => (
                       <span key={pos} className="text-[10px] px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">{pos}</span>
+                    ))}
                   </div>
                   <Button
                     size="sm"
