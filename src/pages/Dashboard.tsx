@@ -262,14 +262,10 @@ const Dashboard = () => {
               <h3 className="section-title">Semana</h3>
             </div>
             <div className="flex justify-between">
-              {weekDays.map(({ date, hasTraining, label }, i) => {
+              {weekDays.map(({ date, hasTraining, label, trainingId, trainingTitle }, i) => {
                 const isToday = isSameDay(date, new Date());
-                return (
-                  <button
-                    key={i}
-                    onClick={() => navigate("/calendario")}
-                    className="flex flex-col items-center gap-1"
-                  >
+                const dayContent = (
+                  <div className="flex flex-col items-center gap-1">
                     <span className={cn(
                       "text-[10px] font-medium uppercase",
                       isToday ? "text-primary" : "text-muted-foreground"
@@ -291,7 +287,44 @@ const Dashboard = () => {
                     {hasTraining && (
                       <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                     )}
-                  </button>
+                  </div>
+                );
+
+                if (!hasTraining) {
+                  return (
+                    <button key={i} onClick={() => navigate("/calendario")} className="flex flex-col items-center gap-1">
+                      {dayContent}
+                    </button>
+                  );
+                }
+
+                return (
+                  <Popover key={i}>
+                    <PopoverTrigger asChild>
+                      <button className="flex flex-col items-center gap-1">
+                        {dayContent}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-44 p-2" side="top" align="center">
+                      {trainingTitle && (
+                        <p className="text-xs font-medium text-foreground mb-2 px-1 truncate">{trainingTitle}</p>
+                      )}
+                      <button
+                        onClick={() => navigate("/calendario")}
+                        className="flex items-center gap-2 w-full px-2 py-1.5 text-sm rounded-md hover:bg-muted transition-colors"
+                      >
+                        <Eye className="w-3.5 h-3.5 text-primary" />
+                        <span>Ver treino</span>
+                      </button>
+                      <button
+                        onClick={() => trainingId && removeScheduledTraining(trainingId)}
+                        className="flex items-center gap-2 w-full px-2 py-1.5 text-sm rounded-md hover:bg-destructive/10 text-destructive transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Remover treino</span>
+                      </button>
+                    </PopoverContent>
+                  </Popover>
                 );
               })}
             </div>
