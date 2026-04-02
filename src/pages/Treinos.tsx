@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, Check, User } from "lucide-react";
+import { Search, Plus, Check, User, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
