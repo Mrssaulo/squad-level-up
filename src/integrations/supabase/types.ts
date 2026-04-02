@@ -140,11 +140,15 @@ export type Database = {
           days_until_game: number
           email: string | null
           id: string
+          is_premium: boolean
           level: string
           name: string
           objective: string | null
           physical_level: number
           position: string
+          premium_expires_at: string | null
+          premium_since: string | null
+          subscription_id: string | null
           total_trainings: number
           trainings_this_week: number
           updated_at: string
@@ -156,11 +160,15 @@ export type Database = {
           days_until_game?: number
           email?: string | null
           id?: string
+          is_premium?: boolean
           level?: string
           name?: string
           objective?: string | null
           physical_level?: number
           position?: string
+          premium_expires_at?: string | null
+          premium_since?: string | null
+          subscription_id?: string | null
           total_trainings?: number
           trainings_this_week?: number
           updated_at?: string
@@ -172,11 +180,15 @@ export type Database = {
           days_until_game?: number
           email?: string | null
           id?: string
+          is_premium?: boolean
           level?: string
           name?: string
           objective?: string | null
           physical_level?: number
           position?: string
+          premium_expires_at?: string | null
+          premium_since?: string | null
+          subscription_id?: string | null
           total_trainings?: number
           trainings_this_week?: number
           updated_at?: string
@@ -213,6 +225,39 @@ export type Database = {
           status?: string
           training_description?: string
           training_title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          mercadopago_subscription_id: string | null
+          plan: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          mercadopago_subscription_id?: string | null
+          plan?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          mercadopago_subscription_id?: string | null
+          plan?: string
+          status?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
