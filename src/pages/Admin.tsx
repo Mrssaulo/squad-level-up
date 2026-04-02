@@ -20,11 +20,17 @@ const Admin = () => {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user || user.email !== ADMIN_EMAIL) {
-      navigate("/dashboard");
-      return;
-    }
-    fetchStats();
+    if (!user) { navigate("/dashboard"); return; }
+
+    const checkAdmin = async () => {
+      const { data, error } = await supabase.rpc("is_admin_email");
+      if (error || !data) {
+        navigate("/dashboard");
+        return;
+      }
+      fetchStats();
+    };
+    checkAdmin();
   }, [user, authLoading]);
 
   const fetchStats = async () => {

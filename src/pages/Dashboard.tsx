@@ -215,10 +215,10 @@ const Dashboard = () => {
   if (authLoading || profileLoading) return <DashboardSkeleton />;
   if (!profile) return <DashboardErrorState />;
 
-  const chartData = Array.from({ length: 30 }, (_, i) => ({
+  const chartData = useMemo(() => Array.from({ length: 30 }, (_, i) => ({
     day: i + 1,
-    score: Math.floor(Math.random() * 30) + profile.physical_level - 15,
-  }));
+    score: Math.floor(Math.sin(i * 0.5) * 15 + Math.cos(i * 0.3) * 10) + profile.physical_level,
+  })), [profile.physical_level]);
 
   const handleStartTraining = () => {
     if (!aiSuggestion) {

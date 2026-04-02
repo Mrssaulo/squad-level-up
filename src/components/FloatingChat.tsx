@@ -226,6 +226,8 @@ const FloatingChat = () => {
   const lastAssistantMsg = [...messages].reverse().find((m) => m.role === "assistant");
   const { suggestions } = lastAssistantMsg ? parseSuggestions(lastAssistantMsg.content) : { suggestions: [] };
 
+  if (!user || isPublicRoute) return null;
+
   return (
     <>
       {!open && (

@@ -236,7 +236,7 @@ const LandingPage = () => {
             <a href="#" className="text-muted-foreground hover:text-primary transition-colors"><Youtube className="w-5 h-5" /></a>
             <a href="#" className="text-muted-foreground hover:text-primary transition-colors"><Twitter className="w-5 h-5" /></a>
           </div>
-          <p className="text-muted-foreground text-xs">© 2024 Saulo Moreira. Todos os direitos reservados.</p>
+          <p className="text-muted-foreground text-xs">© {new Date().getFullYear()} Saulo Moreira. Todos os direitos reservados.</p>
         </div>
       </footer>
     </div>

@@ -183,7 +183,7 @@ const TrainingComplete = () => {
 
         <div className="space-y-3 animate-slide-up" style={{ animationDelay: "0.3s" }}>
           <Button
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/treinos")}
             className="w-full h-14 font-heading font-bold text-base bg-primary hover:bg-primary/90 transition-all"
           >
             <RefreshCw className="w-5 h-5 mr-2" />
