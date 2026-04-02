@@ -169,6 +169,27 @@ const Dashboard = () => {
     });
   };
 
+  const removeScheduledTraining = async (trainingId: string) => {
+    if (!user) return;
+    const { error } = await supabase
+      .from("scheduled_trainings")
+      .delete()
+      .eq("id", trainingId)
+      .eq("user_id", user.id);
+    if (error) {
+      toast.error("Erro ao remover treino");
+      return;
+    }
+    setWeekDays((prev) =>
+      prev.map((d) =>
+        d.trainingId === trainingId
+          ? { ...d, hasTraining: false, trainingId: undefined, trainingTitle: undefined }
+          : d
+      )
+    );
+    toast.success("Treino removido com sucesso!");
+  };
+
   const handleLogout = async () => {
     await signOut();
     navigate("/");
