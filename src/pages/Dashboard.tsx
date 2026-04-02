@@ -185,7 +185,7 @@ const Dashboard = () => {
 
       <div className="px-4 -mt-6 space-y-4 max-w-md mx-auto">
         {/* AI Training Suggestion */}
-        <div className="gradient-card rounded-2xl p-5 border border-border/30 animate-slide-up card-hover shadow-lg shadow-black/20" style={{ animationDelay: "0.1s" }}>
+        <div className="gradient-card rounded-2xl p-5 border border-border/30 animate-slide-up card-hover shadow-lg shadow-black/20" data-tour="ai-training" style={{ animationDelay: "0.1s" }}>
           <div className="flex items-center gap-3 mb-3">
             <div className="icon-container">
               {aiLoading ? <Loader2 className="w-5 h-5 text-primary animate-spin" /> : <Brain className="w-5 h-5 text-primary" />}
