@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { callAI } from "@/lib/ai";
 import { Button } from "@/components/ui/button";
-import { Trophy, RefreshCw, Chrome as Home, Loader as Loader2 } from "lucide-react";
+import { Trophy, RefreshCw, Home, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Exercise {
@@ -183,7 +183,7 @@ const TrainingComplete = () => {
 
         <div className="space-y-3 animate-slide-up" style={{ animationDelay: "0.3s" }}>
           <Button
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/treinos")}
             className="w-full h-14 font-heading font-bold text-base bg-primary hover:bg-primary/90 transition-all"
           >
             <RefreshCw className="w-5 h-5 mr-2" />

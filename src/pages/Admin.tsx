@@ -6,8 +6,6 @@ import { Shield, Users, Crown, DollarSign, ArrowLeft } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-const ADMIN_EMAIL = "saulomoreira@admin.com";
-
 interface Stats {
   totalUsers: number;
   totalPremium: number;
@@ -22,11 +20,17 @@ const Admin = () => {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user || user.email !== ADMIN_EMAIL) {
-      navigate("/dashboard");
-      return;
-    }
-    fetchStats();
+    if (!user) { navigate("/dashboard"); return; }
+
+    const checkAdmin = async () => {
+      const { data, error } = await supabase.rpc("is_admin_email");
+      if (error || !data) {
+        navigate("/dashboard");
+        return;
+      }
+      fetchStats();
+    };
+    checkAdmin();
   }, [user, authLoading]);
 
   const fetchStats = async () => {

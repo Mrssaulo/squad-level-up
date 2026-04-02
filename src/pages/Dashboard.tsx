@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -211,13 +211,14 @@ const Dashboard = () => {
     };
   }, [user, authLoading, navigate]);
 
+  const chartData = useMemo(() => Array.from({ length: 30 }, (_, i) => ({
+    day: i + 1,
+    score: Math.floor(Math.sin(i * 0.5) * 15 + Math.cos(i * 0.3) * 10) + (profile?.physical_level || 75),
+  })), [profile?.physical_level]);
+
   if (authLoading || profileLoading) return <DashboardSkeleton />;
   if (!profile) return <DashboardErrorState />;
-
-  const chartData = Array.from({ length: 30 }, (_, i) => ({
-    day: i + 1,
-    score: Math.floor(Math.random() * 30) + profile.physical_level - 15,
-  }));
+  
 
   const handleStartTraining = () => {
     if (!aiSuggestion) {
