@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
+import OnboardingTour, { type TourStep } from "@/components/OnboardingTour";
 import { Activity, Timer, Shield, Trophy, LogOut, Brain, Loader2, CalendarDays, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
@@ -11,6 +12,45 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { format, startOfWeek, addDays, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+const tourSteps: TourStep[] = [
+  {
+    target: "[data-tour='ai-training']",
+    title: "Treino com IA 🤖",
+    description: "A cada dia, nossa IA analisa seu perfil e sugere o melhor treino. Clique em 'Iniciar' para começar com timer automático!",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tour='week-calendar']",
+    title: "Sua semana 📅",
+    description: "Veja seus treinos agendados da semana. Os dias com bolinha verde já têm treino marcado!",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tour='stats']",
+    title: "Suas estatísticas 📊",
+    description: "Acompanhe treinos da semana, nível físico e total de treinos completados em tempo real.",
+    placement: "top",
+  },
+  {
+    target: "[data-tour='nav-treinos']",
+    title: "Biblioteca de Treinos 💪",
+    description: "Explore mais de 15 treinos organizados por posição, categoria e dificuldade. Cada um com vídeo demonstrativo!",
+    placement: "top",
+  },
+  {
+    target: "[data-tour='nav-ranking']",
+    title: "Ranking Semanal 🏆",
+    description: "Compare seu desempenho com outros jogadores! Quem treina mais sobe no ranking.",
+    placement: "top",
+  },
+  {
+    target: "[data-tour='nav-coach']",
+    title: "Coach IA 🧠",
+    description: "Converse com nosso treinador virtual. Tire dúvidas sobre treinos, nutrição e recuperação!",
+    placement: "top",
+  },
+];
 
 interface Profile {
   name: string;
