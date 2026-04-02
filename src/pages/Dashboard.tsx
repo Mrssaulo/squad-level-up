@@ -228,17 +228,19 @@ const Dashboard = () => {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
           {[
-            { icon: Activity, label: "Treinos semana", value: `${profile.trainings_this_week}/5`, color: "text-primary" },
-            { icon: Shield, label: "Nível físico", value: `${profile.physical_level}%`, color: "text-highlight" },
-            { icon: Timer, label: "Treinos total", value: `${completedCount}`, color: "text-primary" },
-          ].map(({ icon: Icon, label, value, color }, i) => (
+            { icon: Activity, label: "Treinos semana", value: `${profile.trainings_this_week}/5`, color: "text-primary", containerClass: "icon-container" },
+            { icon: Shield, label: "Nível físico", value: `${profile.physical_level}%`, color: "text-accent", containerClass: "icon-container-accent" },
+            { icon: Timer, label: "Treinos total", value: `${completedCount}`, color: "text-primary", containerClass: "icon-container" },
+          ].map(({ icon: Icon, label, value, color, containerClass }, i) => (
             <div
               key={label}
-              className="gradient-card rounded-xl p-3 border border-border/20 text-center animate-slide-up card-hover"
+              className="gradient-card rounded-2xl p-3 border border-border/20 text-center animate-slide-up card-hover"
               style={{ animationDelay: `${0.2 + i * 0.1}s` }}
             >
-              <Icon className={cn("w-5 h-5 mx-auto mb-1", color)} />
-              <p className="text-lg font-heading font-bold">{value}</p>
+              <div className={cn(containerClass, "w-8 h-8 rounded-lg mx-auto mb-2")}>
+                <Icon className={cn("w-4 h-4", color)} />
+              </div>
+              <p className="text-lg font-heading font-extrabold">{value}</p>
               <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{label}</p>
             </div>
           ))}
