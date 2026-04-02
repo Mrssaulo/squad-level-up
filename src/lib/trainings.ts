@@ -7,6 +7,8 @@ export interface Training {
   description: string;
   thumbnail: string;
   positions: string[];
+  demoUrl?: string;
+  demoType?: "gif" | "video";
 }
 
 const ALL_POSITIONS = ["Goleiro", "Zagueiro", "Lateral", "Volante", "Meia", "Ponta", "Centroavante"];
