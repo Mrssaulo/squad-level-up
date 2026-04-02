@@ -13,9 +13,9 @@ import { toast } from "sonner";
 const categories = ["Todos", "Físico", "Técnico", "Tático", "Recuperação"] as const;
 
 const difficultyColors: Record<string, string> = {
-  Fácil: "bg-primary/20 text-primary",
-  Médio: "bg-highlight/20 text-highlight",
-  Difícil: "bg-destructive/20 text-destructive",
+  Fácil: "bg-primary/15 text-primary",
+  Médio: "bg-highlight/15 text-highlight",
+  Difícil: "bg-destructive/15 text-destructive",
 };
 
 const Treinos = () => {
@@ -38,10 +38,7 @@ const Treinos = () => {
         supabase.from("profiles").select("position").eq("user_id", user.id).single(),
       ]);
       if (completed) setCompletedIds(completed.map((d) => d.training_id));
-      if (profile) {
-        setUserPosition(profile.position);
-        setPosFilter(profile.position);
-      }
+      if (profile) { setUserPosition(profile.position); setPosFilter(profile.position); }
     };
     fetchData();
   }, [user, authLoading, navigate]);
@@ -55,28 +52,23 @@ const Treinos = () => {
 
   const addToPlan = async (training: Training) => {
     if (!user) return;
-    if (completedIds.includes(training.id)) {
-      toast.info("Treino já está no plano!");
-      return;
-    }
-    const { error } = await supabase.from("completed_trainings").insert({
-      user_id: user.id,
-      training_id: training.id,
-    });
-    if (error) {
-      toast.error("Erro ao adicionar treino");
-      return;
-    }
+    if (completedIds.includes(training.id)) { toast.info("Treino já está na sua rotina!"); return; }
+    const { error } = await supabase.from("completed_trainings").insert({ user_id: user.id, training_id: training.id });
+    if (error) { toast.error("Erro ao salvar treino"); return; }
     setCompletedIds([...completedIds, training.id]);
-    toast.success(`"${training.title}" adicionado ao plano!`);
+    toast.success(`"${training.title}" adicionado à rotina.`);
   };
 
   return (
     <div className="min-h-screen bg-background pb-20 page-enter">
-      <div className="gradient-header relative overflow-hidden px-4 pt-6 pb-6">
-        <div className="gradient-header-accent absolute inset-0 pointer-events-none" />
+      {/* Header */}
+      <div className="relative overflow-hidden px-4 pt-6 pb-5">
+        <div className="absolute inset-0 bg-gradient-to-b from-surface-2 to-background" />
         <div className="relative max-w-md mx-auto">
-          <h1 className="page-title text-foreground mb-4 animate-fade-in">Biblioteca de Treinos</h1>
+          <div className="mb-4 animate-fade-in">
+            <h1 className="page-title text-foreground mb-1">Biblioteca de treinos</h1>
+            <p className="text-xs text-muted-foreground">Escolha treinos com mais coerência para sua posição, rotina e objetivo.</p>
+          </div>
 
           <div className="relative mb-4 animate-fade-in">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -84,7 +76,7 @@ const Treinos = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar treino..."
-              className="pl-9 bg-muted/50 border-border/50 h-11"
+              className="pl-9 bg-surface-2 border-border/50 h-11"
             />
           </div>
 
@@ -101,9 +93,7 @@ const Treinos = () => {
                   onClick={() => setPosFilter(pos)}
                   className={cn(
                     "px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all",
-                    posFilter === pos
-                      ? "bg-accent text-accent-foreground"
-                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    posFilter === pos ? "bg-accent text-accent-foreground" : "bg-surface-2 text-muted-foreground hover:bg-surface-3"
                   )}
                 >
                   {pos}
@@ -120,9 +110,7 @@ const Treinos = () => {
                 onClick={() => setFilter(cat)}
                 className={cn(
                   "px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all",
-                  filter === cat
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                  filter === cat ? "bg-primary text-primary-foreground" : "bg-surface-2 text-muted-foreground hover:bg-surface-3"
                 )}
               >
                 {cat}
@@ -132,7 +120,7 @@ const Treinos = () => {
         </div>
       </div>
 
-      <div className="px-4 max-w-md mx-auto space-y-3 -mt-2">
+      <div className="px-4 max-w-md mx-auto space-y-3 -mt-1">
         {filtered.length === 0 && (
           <p className="text-center text-muted-foreground text-sm py-8">Nenhum treino encontrado para esses filtros.</p>
         )}
@@ -142,7 +130,7 @@ const Treinos = () => {
           return (
             <div
               key={training.id}
-              className="gradient-card rounded-2xl border border-border/20 overflow-hidden transition-all duration-300 animate-slide-up cursor-pointer card-hover"
+              className="premium-card rounded-2xl overflow-hidden transition-all duration-300 animate-slide-up cursor-pointer"
               style={{ animationDelay: `${i * 0.05}s` }}
               onClick={() => setExpanded(isExpanded ? null : training.id)}
             >
@@ -158,26 +146,13 @@ const Treinos = () => {
               </div>
               {isExpanded && (
                 <div className="px-4 pb-4 animate-fade-in">
-                  {/* Demo media */}
                   {training.demoUrl && (
-                    <div className="mb-3 rounded-xl overflow-hidden bg-muted/30 border border-border/10">
+                    <div className="mb-3 rounded-xl overflow-hidden bg-surface-2 border border-border/10">
                       {training.demoType === "video" ? (
-                        <video
-                          src={training.demoUrl}
-                          controls
-                          loop
-                          muted
-                          playsInline
-                          className="w-full aspect-video object-cover"
-                        />
+                        <video src={training.demoUrl} controls loop muted playsInline className="w-full aspect-video object-cover" />
                       ) : (
                         <div className="relative">
-                          <img
-                            src={training.demoUrl}
-                            alt={`Demo: ${training.title}`}
-                            className="w-full aspect-video object-cover"
-                            loading="lazy"
-                          />
+                          <img src={training.demoUrl} alt={`Demo: ${training.title}`} className="w-full aspect-video object-cover" loading="lazy" />
                           <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-background/80 backdrop-blur-sm rounded-full px-2 py-0.5">
                             <Play className="w-3 h-3 text-primary fill-primary" />
                             <span className="text-[10px] font-semibold text-foreground">Demonstração</span>
@@ -189,19 +164,16 @@ const Treinos = () => {
                   <p className="text-sm text-muted-foreground mb-2">{training.description}</p>
                   <div className="flex flex-wrap gap-1 mb-3">
                     {training.positions.map((pos) => (
-                      <span key={pos} className="text-[10px] px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">{pos}</span>
+                      <span key={pos} className="text-[10px] px-2 py-0.5 rounded-full bg-surface-2 text-muted-foreground">{pos}</span>
                     ))}
                   </div>
                   <Button
                     size="sm"
                     onClick={(e) => { e.stopPropagation(); addToPlan(training); }}
-                    className={cn(
-                      "w-full font-semibold transition-all hover:scale-[1.02]",
-                      inPlan ? "bg-muted text-muted-foreground" : "bg-primary hover:bg-primary/90"
-                    )}
+                    className={cn("w-full font-semibold transition-all hover:scale-[1.02]", inPlan ? "bg-muted text-muted-foreground" : "")}
                     disabled={inPlan}
                   >
-                    {inPlan ? <><Check className="w-4 h-4 mr-1" /> No plano</> : <><Plus className="w-4 h-4 mr-1" /> Adicionar ao plano</>}
+                    {inPlan ? <><Check className="w-4 h-4 mr-1" /> Na rotina</> : <><Plus className="w-4 h-4 mr-1" /> Adicionar à rotina</>}
                   </Button>
                 </div>
               )}

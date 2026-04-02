@@ -62,33 +62,40 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen gradient-field flex items-center justify-center p-4">
-      <div className="w-full max-w-md animate-fade-in">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,hsl(145_65%_42%/0.08),transparent)]" />
+
+      <div className="w-full max-w-md relative z-10 animate-fade-in">
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/20 mb-4 animate-pulse-glow">
-            <Trophy className="w-10 h-10 text-primary" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 border border-primary/15 mb-5">
+            <Trophy className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-heading font-extrabold tracking-tight">
-            <span className="text-gradient">Pro Futebol</span>{" "}
-            <span className="text-foreground">SM</span>
+          <h1 className="text-2xl md:text-3xl font-heading font-extrabold tracking-tight mb-2">
+            {isSignUp ? (
+              <>Comece sua evolução com mais <span className="text-gradient">direção</span></>
+            ) : (
+              <>Volte para sua <span className="text-gradient">rotina</span></>
+            )}
           </h1>
-          <p className="text-muted-foreground mt-2 text-sm">
-            {isSignUp ? "Crie sua conta e comece a evoluir" : "Bem-vindo de volta, atleta!"}
+          <p className="text-muted-foreground text-sm max-w-xs mx-auto">
+            {isSignUp
+              ? "Monte sua base no app e organize sua rotina como atleta."
+              : "Acesse seu painel e continue sua evolução."}
           </p>
         </div>
 
         {/* Toggle */}
-        <div className="flex bg-muted/50 rounded-lg p-1 mb-6">
+        <div className="flex bg-surface-2 rounded-xl p-1 mb-6">
           <button
             onClick={() => setIsSignUp(true)}
-            className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${isSignUp ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${isSignUp ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
           >
             Cadastro
           </button>
           <button
             onClick={() => setIsSignUp(false)}
-            className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${!isSignUp ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${!isSignUp ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
           >
             Login
           </button>
@@ -103,7 +110,7 @@ const Login = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Seu nome"
-                className="bg-muted/50 border-border/50 focus:border-primary h-12"
+                className="bg-surface-2 border-border/50 focus:border-primary h-12"
               />
             </div>
           )}
@@ -115,20 +122,20 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
-              className="bg-muted/50 border-border/50 focus:border-primary h-12"
+              className="bg-surface-2 border-border/50 focus:border-primary h-12"
             />
           </div>
 
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Senha</label>
-          <div className="relative">
+            <div className="relative">
               <Input
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 minLength={6}
-                className="bg-muted/50 border-border/50 focus:border-primary h-12 pr-10"
+                className="bg-surface-2 border-border/50 focus:border-primary h-12 pr-10"
               />
               <button
                 type="button"
@@ -143,9 +150,9 @@ const Login = () => {
           {isSignUp && (
             <>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Posição</label>
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Posição em campo</label>
                 <Select value={position} onValueChange={setPosition}>
-                  <SelectTrigger className="bg-muted/50 border-border/50 h-12">
+                  <SelectTrigger className="bg-surface-2 border-border/50 h-12">
                     <SelectValue placeholder="Selecione sua posição" />
                   </SelectTrigger>
                   <SelectContent>
@@ -166,7 +173,7 @@ const Login = () => {
                     placeholder="18"
                     min={10}
                     max={50}
-                    className="bg-muted/50 border-border/50 focus:border-primary h-12"
+                    className="bg-surface-2 border-border/50 focus:border-primary h-12"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -175,7 +182,7 @@ const Login = () => {
                     value={objective}
                     onChange={(e) => setObjective(e.target.value)}
                     placeholder="Ser titular"
-                    className="bg-muted/50 border-border/50 focus:border-primary h-12"
+                    className="bg-surface-2 border-border/50 focus:border-primary h-12"
                   />
                 </div>
               </div>
@@ -185,9 +192,9 @@ const Login = () => {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-14 text-lg font-heading font-bold bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] mt-6"
+            className="w-full h-14 text-base font-heading font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] mt-6"
           >
-            {loading ? "Carregando..." : isSignUp ? "⚽ Criar conta" : "⚽ Entrar no vestiário"}
+            {loading ? "Carregando..." : isSignUp ? "Criar minha conta" : "Acessar meu painel"}
           </Button>
         </form>
 
@@ -211,7 +218,7 @@ const Login = () => {
               value={forgotEmail}
               onChange={(e) => setForgotEmail(e.target.value)}
               placeholder="seu@email.com"
-              className="bg-muted/50 border-border/50 focus:border-primary h-12"
+              className="bg-surface-2 border-border/50 focus:border-primary h-12"
             />
             <Button
               type="button"
@@ -229,7 +236,7 @@ const Login = () => {
                   setForgotMode(false);
                 }
               }}
-              className="w-full h-12 bg-primary hover:bg-primary/90"
+              className="w-full h-12"
             >
               {forgotLoading ? "Enviando..." : "Enviar link de redefinição"}
             </Button>
@@ -243,8 +250,8 @@ const Login = () => {
           </div>
         )}
 
-        <p className="text-center text-muted-foreground text-xs mt-6">
-          Treine como profissional. Evolua como campeão.
+        <p className="text-center text-muted-foreground/60 text-xs mt-8">
+          Preparação não acontece no improviso.
         </p>
       </div>
     </div>
