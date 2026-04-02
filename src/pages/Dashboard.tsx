@@ -453,4 +453,22 @@ const DashboardSkeleton = () => (
   </div>
 );
 
+const DashboardErrorState = () => (
+  <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="max-w-sm w-full text-center space-y-4">
+      <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto text-2xl">
+        ⚠️
+      </div>
+      <div className="space-y-2">
+        <h2 className="text-xl font-heading font-bold text-foreground">Não foi possível carregar seu painel</h2>
+        <p className="text-sm text-muted-foreground">Tente recarregar a página. Se o problema continuar, entre novamente na sua conta.</p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <Button onClick={() => window.location.reload()} className="w-full">Recarregar</Button>
+        <Button variant="outline" onClick={() => window.location.assign("/login")} className="w-full">Ir para login</Button>
+      </div>
+    </div>
+  </div>
+);
+
 export default Dashboard;
