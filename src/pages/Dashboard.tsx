@@ -211,12 +211,13 @@ const Dashboard = () => {
     };
   }, [user, authLoading, navigate]);
 
-  if (authLoading || profileLoading) return <DashboardSkeleton />;
-  if (!profile) return <DashboardErrorState />;
-
   const chartData = useMemo(() => Array.from({ length: 30 }, (_, i) => ({
     day: i + 1,
-    score: Math.floor(Math.sin(i * 0.5) * 15 + Math.cos(i * 0.3) * 10) + profile.physical_level,
+    score: Math.floor(Math.sin(i * 0.5) * 15 + Math.cos(i * 0.3) * 10) + (profile?.physical_level || 75),
+  })), [profile?.physical_level]);
+
+  if (authLoading || profileLoading) return <DashboardSkeleton />;
+  if (!profile) return <DashboardErrorState />;
   })), [profile.physical_level]);
 
   const handleStartTraining = () => {
