@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Bot, Loader2, History, ArrowLeft, Dumbbell, Apple, Brain, Trash2 } from "lucide-react";
+import { MessageCircle, X, Send, Bot, Loader2, History, ArrowLeft, Dumbbell, Apple, Brain, Trash2, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { streamChat, canSendMessage, recordMessage, getRemainingMessages } from "@/lib/ai";
@@ -154,7 +154,6 @@ const FloatingChat = () => {
     const messageText = text || input.trim();
     if (!messageText || loading) return;
     if (!canSendMessage()) {
-      toast.error("Limite de 3 mensagens por dia atingido!");
       return;
     }
 
@@ -374,20 +373,40 @@ const FloatingChat = () => {
                 )}
               </div>
 
-              {/* Input */}
+              {/* Input or Premium upsell */}
               <div className="p-3 border-t border-border/30 shrink-0">
-                <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex gap-2">
-                  <Input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Pergunte ao Coach..."
-                    className="flex-1 h-9 text-sm bg-muted/50 border-border/50"
-                    disabled={loading || remaining === 0}
-                  />
-                  <Button type="submit" size="sm" className="h-9 w-9 p-0" disabled={loading || !input.trim() || remaining === 0}>
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </form>
+                {remaining === 0 ? (
+                  <div className="text-center py-2">
+                    <Crown className="w-6 h-6 mx-auto mb-2 text-primary" />
+                    <p className="text-xs text-foreground font-semibold mb-1">
+                      Você usou sua pergunta diária gratuita.
+                    </p>
+                    <p className="text-[10px] text-muted-foreground mb-3">
+                      Seja Premium e converse sem limites!
+                    </p>
+                    <Button
+                      size="sm"
+                      className="w-full h-9 font-semibold bg-primary hover:bg-primary/90"
+                      onClick={() => toast.info("Em breve! Plano Premium chegando.")}
+                    >
+                      <Crown className="w-4 h-4 mr-1.5" />
+                      Quero ser Premium
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex gap-2">
+                    <Input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="Pergunte ao Coach..."
+                      className="flex-1 h-9 text-sm bg-muted/50 border-border/50"
+                      disabled={loading}
+                    />
+                    <Button type="submit" size="sm" className="h-9 w-9 p-0" disabled={loading || !input.trim()}>
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </form>
+                )}
               </div>
             </>
           )}
