@@ -25,7 +25,7 @@ const BottomNav = () => {
               onClick={() => navigate(path)}
               className={cn(
                 "flex flex-col items-center gap-0.5 px-4 py-2 rounded-lg transition-all duration-200",
-                active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                active ? "text-primary scale-110" : "text-muted-foreground hover:text-foreground hover:scale-105"
               )}
             >
               <Icon className={cn("w-5 h-5", active && "drop-shadow-[0_0_8px_hsl(var(--primary))]")} />
