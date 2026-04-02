@@ -172,9 +172,10 @@ const Dashboard = () => {
           )}
           <Button
             onClick={handleStartTraining}
-            className="w-full h-12 font-heading font-bold bg-primary hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full h-12 font-heading font-extrabold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-primary/20"
           >
-            🔥 Iniciar aquecimento
+            <Flame className="w-5 h-5 mr-2" />
+            Iniciar aquecimento
           </Button>
         </div>
 
