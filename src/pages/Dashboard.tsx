@@ -309,6 +309,7 @@ const Dashboard = () => {
       </div>
 
       <BottomNav />
+      <OnboardingTour steps={tourSteps} storageKey="dashboard-tour-seen" />
     </div>
   );
 };
