@@ -143,13 +143,15 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="px-4 -mt-4 space-y-4 max-w-md mx-auto">
+      <div className="px-4 -mt-6 space-y-4 max-w-md mx-auto">
         {/* AI Training Suggestion */}
-        <div className="gradient-card rounded-xl p-5 border border-border/30 animate-slide-up card-hover" style={{ animationDelay: "0.1s" }}>
-          <div className="flex items-center gap-2 mb-3">
-            {aiLoading ? <Loader2 className="w-5 h-5 text-primary animate-spin" /> : <Brain className="w-5 h-5 text-primary" />}
-            <h3 className="font-heading text-base font-bold">
-              {aiSuggestion ? "🧠 Treino sugerido pela IA" : "Treino de hoje"}
+        <div className="gradient-card rounded-2xl p-5 border border-border/30 animate-slide-up card-hover shadow-lg shadow-black/20" style={{ animationDelay: "0.1s" }}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="icon-container">
+              {aiLoading ? <Loader2 className="w-5 h-5 text-primary animate-spin" /> : <Brain className="w-5 h-5 text-primary" />}
+            </div>
+            <h3 className="font-heading text-base font-extrabold tracking-tight">
+              {aiSuggestion ? "Treino sugerido pela IA" : "Treino de hoje"}
             </h3>
           </div>
           <p className="text-sm text-muted-foreground mb-2">
