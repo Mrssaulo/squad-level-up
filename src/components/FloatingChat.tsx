@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Bot, Loader2, History, ArrowLeft, Dumbbell, Apple, Brain, Trash2 } from "lucide-react";
+import { MessageCircle, X, Send, Bot, Loader2, History, ArrowLeft, Dumbbell, Apple, Brain, Trash2, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { streamChat, canSendMessage, recordMessage, getRemainingMessages } from "@/lib/ai";
