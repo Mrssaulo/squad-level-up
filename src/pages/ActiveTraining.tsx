@@ -89,7 +89,7 @@ const ActiveTraining = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col page-enter">
       <div className="flex-1 flex flex-col">
         <div className="gradient-field px-4 pt-6 pb-8">
           <div className="max-w-md mx-auto">
