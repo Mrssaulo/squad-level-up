@@ -21,6 +21,38 @@ interface TrainingData {
   exercises: Exercise[];
 }
 
+const CONFETTI_COLORS = [
+  "hsl(142, 72%, 37%)", // primary green
+  "hsl(24, 94%, 53%)",  // accent orange
+  "hsl(45, 93%, 58%)",  // gold
+  "hsl(200, 80%, 55%)", // blue
+  "hsl(340, 80%, 55%)", // pink
+];
+
+const ConfettiPiece = ({ index }: { index: number }) => {
+  const left = Math.random() * 100;
+  const delay = Math.random() * 2;
+  const size = Math.random() * 8 + 4;
+  const color = CONFETTI_COLORS[index % CONFETTI_COLORS.length];
+  const shape = index % 3 === 0 ? "rounded-full" : index % 3 === 1 ? "rounded-sm" : "";
+
+  return (
+    <div
+      className={`absolute animate-confetti-fall ${shape}`}
+      style={{
+        left: `${left}%`,
+        top: "-20px",
+        width: `${size}px`,
+        height: `${size * (index % 2 === 0 ? 1 : 0.6)}px`,
+        backgroundColor: color,
+        animationDelay: `${delay}s`,
+        animationDuration: `${2.5 + Math.random() * 1.5}s`,
+        opacity: 0.9,
+      }}
+    />
+  );
+};
+
 const TrainingComplete = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,6 +60,12 @@ const TrainingComplete = () => {
   const [motivationalMessage, setMotivationalMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowConfetti(false), 4000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -101,26 +139,26 @@ const TrainingComplete = () => {
     saveAndGenerateMessage();
   }, [user, location.state, navigate]);
 
-  const handleTrainAgain = () => {
-    navigate("/dashboard");
-  };
-
-  const handleGoHome = () => {
-    navigate("/dashboard");
-  };
-
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="max-w-md w-full text-center animate-scale-in">
-        <div className="relative mb-8">
-          <div className="absolute inset-0 animate-ping">
-            <Trophy className="w-24 h-24 mx-auto text-primary opacity-20" />
-          </div>
-          <Trophy className="w-24 h-24 mx-auto text-primary relative animate-bounce" />
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 overflow-hidden relative">
+      {/* Confetti */}
+      {showConfetti && (
+        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+          {Array.from({ length: 50 }).map((_, i) => (
+            <ConfettiPiece key={i} index={i} />
+          ))}
+        </div>
+      )}
+
+      <div className="max-w-md w-full text-center">
+        {/* Trophy with bounce-in */}
+        <div className="relative mb-8 animate-bounce-in">
+          <div className="absolute inset-0 animate-pulse-glow rounded-full w-28 h-28 mx-auto" />
+          <Trophy className="w-24 h-24 mx-auto text-primary relative animate-float" />
         </div>
 
         <h1 className="font-heading text-4xl font-extrabold text-foreground mb-3 animate-fade-in">
-          Treino Concluído!
+          Treino Concluído! 🏆
         </h1>
 
         <div className="min-h-[60px] flex items-center justify-center mb-8">
@@ -137,7 +175,7 @@ const TrainingComplete = () => {
         </div>
 
         {saving && (
-          <div className="mb-6 text-sm text-muted-foreground flex items-center justify-center gap-2">
+          <div className="mb-6 text-sm text-muted-foreground flex items-center justify-center gap-2 animate-fade-in">
             <Loader2 className="w-4 h-4 animate-spin" />
             Salvando no histórico...
           </div>
@@ -145,27 +183,21 @@ const TrainingComplete = () => {
 
         <div className="space-y-3 animate-slide-up" style={{ animationDelay: "0.3s" }}>
           <Button
-            onClick={handleTrainAgain}
-            className="w-full h-14 font-heading font-bold text-base bg-primary hover:bg-primary/90 transition-all hover:scale-[1.02]"
+            onClick={() => navigate("/dashboard")}
+            className="w-full h-14 font-heading font-bold text-base bg-primary hover:bg-primary/90 transition-all"
           >
             <RefreshCw className="w-5 h-5 mr-2" />
             Treinar Novamente
           </Button>
 
           <Button
-            onClick={handleGoHome}
+            onClick={() => navigate("/dashboard")}
             variant="outline"
-            className="w-full h-14 font-heading font-bold text-base border-border/50 hover:bg-muted/50 transition-all hover:scale-[1.02]"
+            className="w-full h-14 font-heading font-bold text-base border-border/50 hover:bg-muted/50 transition-all"
           >
             <Home className="w-5 h-5 mr-2" />
             Voltar ao Início
           </Button>
-        </div>
-
-        <div className="mt-8 flex items-center justify-center gap-2 text-primary animate-pulse">
-          <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0s" }} />
-          <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0.1s" }} />
-          <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0.2s" }} />
         </div>
       </div>
     </div>
