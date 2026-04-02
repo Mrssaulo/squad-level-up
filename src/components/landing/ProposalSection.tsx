@@ -10,7 +10,7 @@ const pillars = [
   {
     icon: Calendar,
     title: "Plano semanal",
-    desc: "Organize sua rotina com mais consistência, sem depender de improviso.",
+    desc: "Uma rotina organizada para reduzir improviso e aumentar consistência.",
   },
   {
     icon: TrendingUp,
