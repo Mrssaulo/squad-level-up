@@ -5,7 +5,7 @@ const steps = [
   {
     icon: UserPlus,
     number: "01",
-    title: "Crie sua conta e defina seu perfil",
+    title: "Monte seu perfil no app",
     desc: "Informe sua posição, nível e objetivo para receber orientação personalizada.",
   },
   {
