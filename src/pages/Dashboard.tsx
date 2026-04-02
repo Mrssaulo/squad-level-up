@@ -106,19 +106,18 @@ const Dashboard = () => {
         .eq("user_id", user.id)
         .gte("scheduled_date", format(weekStart, "yyyy-MM-dd"))
         .lte("scheduled_date", format(weekEnd, "yyyy-MM-dd"));
-        .eq("user_id", user.id)
-        .gte("scheduled_date", format(weekStart, "yyyy-MM-dd"))
-        .lte("scheduled_date", format(weekEnd, "yyyy-MM-dd"));
 
       const days = Array.from({ length: 7 }, (_, i) => {
         const date = addDays(weekStart, i);
-        const hasTraining = (scheduled || []).some(
+        const match = (scheduled || []).find(
           (s: any) => isSameDay(new Date(s.scheduled_date + "T12:00:00"), date)
         );
         return {
           date,
-          hasTraining,
+          hasTraining: !!match,
           label: format(date, "EEE", { locale: ptBR }).slice(0, 3),
+          trainingId: match?.id,
+          trainingTitle: match?.training_title,
         };
       });
       setWeekDays(days);
