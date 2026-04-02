@@ -24,17 +24,42 @@ export interface Assessment {
 
 const STORAGE_KEY = "profutebolsm_athlete";
 
+function safeGetItem(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSetItem(key: string, value: string): void {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // storage full or blocked
+  }
+}
+
 export function getAthlete(): Athlete | null {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : null;
+  const data = safeGetItem(STORAGE_KEY);
+  if (!data) return null;
+  try {
+    return JSON.parse(data);
+  } catch {
+    return null;
+  }
 }
 
 export function saveAthlete(athlete: Athlete): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(athlete));
+  safeSetItem(STORAGE_KEY, JSON.stringify(athlete));
 }
 
 export function clearAthlete(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
+  }
 }
 
 export function createAthlete(name: string, email: string, position: string, age: number): Athlete {
