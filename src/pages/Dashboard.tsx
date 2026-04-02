@@ -8,6 +8,7 @@ import OnboardingTour, { type TourStep } from "@/components/OnboardingTour";
 import { Activity, Timer, Shield, Trophy, LogOut, Brain, Loader2, CalendarDays, Flame, Eye, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { format, startOfWeek, addDays, isSameDay } from "date-fns";
