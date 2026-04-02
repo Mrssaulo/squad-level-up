@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { format, startOfWeek, addDays, isSameDay } from "date-fns";
+import { useMemo } from "react";
 import { ptBR } from "date-fns/locale";
 
 const tourSteps: TourStep[] = [
