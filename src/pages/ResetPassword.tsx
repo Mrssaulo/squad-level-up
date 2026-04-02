@@ -15,8 +15,15 @@ const ResetPassword = () => {
   const [isRecovery, setIsRecovery] = useState(false);
 
   useEffect(() => {
+    // Check hash for recovery token
     const hash = window.location.hash;
-    if (hash.includes("type=recovery")) {
+    if (hash.includes("type=recovery") || hash.includes("type=signup")) {
+      setIsRecovery(true);
+    }
+
+    // Also check URL search params (some Supabase versions use query params)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("type") === "recovery") {
       setIsRecovery(true);
     }
 
@@ -47,8 +54,9 @@ const ResetPassword = () => {
         toast.error(error.message);
         return;
       }
-      toast.success("Senha redefinida com sucesso!");
-      navigate("/dashboard");
+      toast.success("Senha redefinida com sucesso! Faça login com sua nova senha.");
+      await supabase.auth.signOut();
+      navigate("/login");
     } finally {
       setLoading(false);
     }
