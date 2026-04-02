@@ -247,10 +247,12 @@ const Dashboard = () => {
         </div>
 
         {/* Chart */}
-        <div className="gradient-card rounded-xl p-4 border border-border/20 animate-slide-up card-hover" style={{ animationDelay: "0.5s" }}>
-          <div className="flex items-center gap-2 mb-3">
-            <Trophy className="w-4 h-4 text-highlight" />
-            <h3 className="font-heading text-sm font-bold">Evolução — 30 dias</h3>
+        <div className="gradient-card rounded-2xl p-4 border border-border/20 animate-slide-up card-hover" style={{ animationDelay: "0.5s" }}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="icon-container-gold">
+              <Trophy className="w-4 h-4 text-yellow-500" />
+            </div>
+            <h3 className="section-title">Evolução — 30 dias</h3>
           </div>
           <div className="h-28">
             <ResponsiveContainer width="100%" height="100%">
