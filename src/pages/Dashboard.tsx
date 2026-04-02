@@ -74,6 +74,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { user, signOut, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
   const [completedCount, setCompletedCount] = useState(0);
   const [aiSuggestion, setAiSuggestion] = useState<{ title: string; description: string; exercises: any[] } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
@@ -81,75 +82,136 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user) { navigate("/login"); return; }
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    let isMounted = true;
 
     const fetchData = async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
-      if (data) setProfile(data);
+      setProfileLoading(true);
 
-      const { count } = await supabase
-        .from("completed_trainings")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id);
-      setCompletedCount(count || 0);
+      try {
+        const { data: existingProfile, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle();
 
-      // Fetch week schedule
-      const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-      const weekEnd = addDays(weekStart, 6);
-      const { data: scheduled } = await supabase
-        .from("scheduled_trainings")
-        .select("id, scheduled_date, status, training_title")
-        .eq("user_id", user.id)
-        .gte("scheduled_date", format(weekStart, "yyyy-MM-dd"))
-        .lte("scheduled_date", format(weekEnd, "yyyy-MM-dd"));
+        if (profileError) throw profileError;
 
-      const days = Array.from({ length: 7 }, (_, i) => {
-        const date = addDays(weekStart, i);
-        const match = (scheduled || []).find(
-          (s: any) => isSameDay(new Date(s.scheduled_date + "T12:00:00"), date)
-        );
-        return {
-          date,
-          hasTraining: !!match,
-          label: format(date, "EEE", { locale: ptBR }).slice(0, 3),
-          trainingId: match?.id,
-          trainingTitle: match?.training_title,
-        };
-      });
-      setWeekDays(days);
+        let currentProfile = existingProfile;
 
-      // AI daily suggestion (cached for the day)
-      if (data) {
+        if (!currentProfile) {
+          const { data: createdProfile, error: createProfileError } = await supabase
+            .from("profiles")
+            .insert({
+              user_id: user.id,
+              name: user.user_metadata?.name || user.email?.split("@")[0] || "Atleta",
+              email: user.email || null,
+            })
+            .select("*")
+            .single();
+
+          if (createProfileError) throw createProfileError;
+          currentProfile = createdProfile;
+        }
+
+        if (!isMounted || !currentProfile) return;
+
+        setProfile(currentProfile);
+
+        const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+        const weekEnd = addDays(weekStart, 6);
+
+        const [{ count }, { data: scheduled }] = await Promise.all([
+          supabase
+            .from("completed_trainings")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", user.id),
+          supabase
+            .from("scheduled_trainings")
+            .select("id, scheduled_date, status, training_title")
+            .eq("user_id", user.id)
+            .gte("scheduled_date", format(weekStart, "yyyy-MM-dd"))
+            .lte("scheduled_date", format(weekEnd, "yyyy-MM-dd")),
+        ]);
+
+        if (!isMounted) return;
+
+        setCompletedCount(count || 0);
+
+        const days = Array.from({ length: 7 }, (_, i) => {
+          const date = addDays(weekStart, i);
+          const match = (scheduled || []).find(
+            (s: any) => isSameDay(new Date(s.scheduled_date + "T12:00:00"), date)
+          );
+          return {
+            date,
+            hasTraining: !!match,
+            label: format(date, "EEE", { locale: ptBR }).slice(0, 3),
+            trainingId: match?.id,
+            trainingTitle: match?.training_title,
+          };
+        });
+        setWeekDays(days);
+
         const cacheKey = `daily_suggestion_${new Date().toDateString()}`;
         const cached = localStorage.getItem(cacheKey);
         if (cached) {
           try {
             setAiSuggestion(JSON.parse(cached));
-          } catch { /* ignore */ }
-        } else {
-          setAiLoading(true);
-          try {
-            const result = await callAI(
-              [{ role: "user", content: "Sugira o melhor treino para hoje." }],
-              "daily-suggestion",
-              { position: data.position, level: data.level, trainingsThisWeek: data.trainings_this_week, physicalLevel: data.physical_level, totalTrainings: data.total_trainings }
-            );
-            const parsed = JSON.parse(result);
-            setAiSuggestion(parsed);
-            localStorage.setItem(cacheKey, JSON.stringify(parsed));
-          } catch { /* silent fail */ }
-          setAiLoading(false);
+            return;
+          } catch {
+            localStorage.removeItem(cacheKey);
+          }
         }
+
+        setAiLoading(true);
+        try {
+          const result = await callAI(
+            [{ role: "user", content: "Sugira o melhor treino para hoje." }],
+            "daily-suggestion",
+            {
+              position: currentProfile.position,
+              level: currentProfile.level,
+              trainingsThisWeek: currentProfile.trainings_this_week,
+              physicalLevel: currentProfile.physical_level,
+              totalTrainings: currentProfile.total_trainings,
+            }
+          );
+
+          if (!isMounted) return;
+
+          const parsed = JSON.parse(result);
+          setAiSuggestion(parsed);
+          localStorage.setItem(cacheKey, JSON.stringify(parsed));
+        } catch (error) {
+          console.error("Error generating daily suggestion:", error);
+        } finally {
+          if (isMounted) setAiLoading(false);
+        }
+      } catch (error) {
+        console.error("Error loading dashboard:", error);
+        if (isMounted) {
+          setProfile(null);
+          toast.error("Não foi possível carregar seu painel.");
+        }
+      } finally {
+        if (isMounted) setProfileLoading(false);
       }
     };
+
     fetchData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user, authLoading, navigate]);
 
-  if (authLoading || !profile) return <DashboardSkeleton />;
+  if (authLoading || profileLoading) return <DashboardSkeleton />;
+  if (!profile) return <DashboardErrorState />;
 
   const chartData = Array.from({ length: 30 }, (_, i) => ({
     day: i + 1,
