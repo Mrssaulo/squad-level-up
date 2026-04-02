@@ -52,7 +52,7 @@ const Avaliacao = () => {
   }, [user, authLoading, navigate]);
 
   const handleCalculate = () => {
-    if (!weight || !height || !fat || !run12 || !sprint30) { toast.error("Preencha todos os campos!"); return; }
+    if (!weight || !height || !fat || !run12 || !sprint30) { toast.error("Preencha todos os campos."); return; }
     const w = parseFloat(weight); const h = parseFloat(height); const f = parseFloat(fat); const r = parseFloat(run12);
     const imc = calculateIMC(w, h); const category = determineCategory(imc, f, r);
     const detailed = getDetailedAssessment(position, category, imc, f, r);
@@ -71,7 +71,7 @@ const Avaliacao = () => {
     if (!result || !user) return;
     const { error } = await supabase.from("assessments").insert({ user_id: user.id, imc: result.imc, fat_percentage: parseFloat(fat), run_12min: parseFloat(run12), sprint_30m: parseFloat(sprint30), category: result.category });
     if (error) { toast.error("Erro ao salvar avaliação"); return; }
-    toast.success("Avaliação salva com sucesso.");
+    toast.success("Avaliação salva.");
   };
 
   const conditioningPercent = result ? result.conditioningLevel === "Excelente" ? 95 : result.conditioningLevel === "Bom" ? 70 : result.conditioningLevel === "Regular" ? 45 : 25 : 0;
@@ -90,8 +90,8 @@ const Avaliacao = () => {
         <div className="relative max-w-md mx-auto">
           <div className="flex items-center justify-between mb-1 animate-fade-in">
             <div>
-              <h1 className="page-title text-foreground mb-1">Indicadores do seu processo</h1>
-              <p className="text-xs text-muted-foreground">Avalie seu momento e acompanhe sua evolução com dados reais.</p>
+              <h1 className="page-title text-foreground mb-1">Leitura do seu momento</h1>
+              <p className="text-xs text-muted-foreground">Avalie seus indicadores e acompanhe sua evolução com dados reais.</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <Sun className="w-3.5 h-3.5 text-muted-foreground" />
@@ -105,7 +105,7 @@ const Avaliacao = () => {
       <div className="px-4 max-w-md mx-auto">
         <div className="premium-card rounded-2xl p-5 mb-4 animate-slide-up">
           <h2 className="font-heading text-sm font-bold mb-4 flex items-center gap-2">
-            <Activity className="w-4 h-4 text-primary" /> Calculadora IMC
+            <Activity className="w-4 h-4 text-primary" /> Composição corporal
           </h2>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Peso (kg)" value={weight} onChange={setWeight} placeholder="75" />
@@ -114,7 +114,7 @@ const Avaliacao = () => {
         </div>
 
         <div className="premium-card rounded-2xl p-5 mb-4 animate-slide-up" style={{ animationDelay: "0.1s" }}>
-          <h2 className="font-heading text-sm font-bold mb-4">Avaliação completa</h2>
+          <h2 className="font-heading text-sm font-bold mb-4">Indicadores de desempenho</h2>
           <div className="space-y-3">
             <Field label="% Gordura corporal" value={fat} onChange={setFat} placeholder="12" />
             <Field label="Corrida 12min (metros)" value={run12} onChange={setRun12} placeholder="2800" />
@@ -151,7 +151,7 @@ const Avaliacao = () => {
 
             {result.improvements.length > 0 && (
               <div className="premium-card rounded-2xl p-5">
-                <div className="flex items-center gap-2 mb-3"><TrendingDown className="w-4 h-4 text-destructive" /><p className="text-xs text-muted-foreground uppercase tracking-wider">Pontos a melhorar</p></div>
+                <div className="flex items-center gap-2 mb-3"><TrendingDown className="w-4 h-4 text-destructive" /><p className="text-xs text-muted-foreground uppercase tracking-wider">Pontos a desenvolver</p></div>
                 <ul className="space-y-2">
                   {result.improvements.map((s, i) => (<li key={i} className="flex items-start gap-2 text-sm text-foreground"><span className="w-4 h-4 rounded-full bg-destructive/15 flex items-center justify-center text-destructive text-[10px] mt-0.5 shrink-0">!</span>{s}</li>))}
                 </ul>
@@ -177,7 +177,7 @@ const Avaliacao = () => {
             )}
 
             <Button onClick={handleSave} className="w-full h-12 font-heading font-bold bg-accent hover:bg-accent/90 transition-all hover:scale-[1.02]">
-              Salvar evolução
+              Salvar avaliação
             </Button>
           </div>
         )}

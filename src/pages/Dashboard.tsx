@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
 import OnboardingTour, { type TourStep } from "@/components/OnboardingTour";
-import { Activity, Timer, Shield, Trophy, LogOut, Loader2, CalendarDays, Flame, Eye, Trash2, ArrowRight } from "lucide-react";
+import { Activity, Timer, Shield, LogOut, Loader2, CalendarDays, Eye, Trash2, ArrowRight, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -15,53 +15,17 @@ import { format, startOfWeek, addDays, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 const tourSteps: TourStep[] = [
-  {
-    target: "[data-tour='ai-training']",
-    title: "Seu foco de hoje",
-    description: "A cada dia, o sistema analisa seu perfil e sugere o treino mais coerente. Clique em 'Iniciar' para começar.",
-    placement: "bottom",
-  },
-  {
-    target: "[data-tour='week-calendar']",
-    title: "Sua semana",
-    description: "Visualize sua rotina semanal. Dias com marcação já têm treino organizado.",
-    placement: "bottom",
-  },
-  {
-    target: "[data-tour='stats']",
-    title: "Seus indicadores",
-    description: "Acompanhe treinos da semana, nível físico e total de sessões concluídas.",
-    placement: "top",
-  },
-  {
-    target: "[data-tour='nav-treinos']",
-    title: "Biblioteca de treinos",
-    description: "Explore treinos organizados por posição, categoria e nível de dificuldade.",
-    placement: "top",
-  },
-  {
-    target: "[data-tour='nav-ranking']",
-    title: "Ranking semanal",
-    description: "Acompanhe sua consistência em comparação com outros atletas.",
-    placement: "top",
-  },
-  {
-    target: "[data-tour='nav-coach']",
-    title: "Coach de apoio",
-    description: "Use o coach para tirar dúvidas e ajustar foco no seu processo.",
-    placement: "top",
-  },
+  { target: "[data-tour='ai-training']", title: "Seu foco de hoje", description: "A cada dia, o sistema analisa seu perfil e sugere o treino mais coerente. Clique em 'Iniciar' para começar.", placement: "bottom" },
+  { target: "[data-tour='week-calendar']", title: "Sua semana", description: "Visualize sua rotina semanal. Dias com marcação já têm treino organizado.", placement: "bottom" },
+  { target: "[data-tour='stats']", title: "Seus indicadores", description: "Acompanhe treinos da semana, nível físico e total de sessões concluídas.", placement: "top" },
+  { target: "[data-tour='nav-treinos']", title: "Biblioteca de treinos", description: "Explore treinos organizados por posição, categoria e nível de dificuldade.", placement: "top" },
+  { target: "[data-tour='nav-ranking']", title: "Ranking semanal", description: "Acompanhe sua consistência em comparação com outros atletas.", placement: "top" },
+  { target: "[data-tour='nav-coach']", title: "Coach de apoio", description: "Use o coach para tirar dúvidas e ajustar foco no seu processo.", placement: "top" },
 ];
 
 interface Profile {
-  name: string;
-  position: string;
-  age: number;
-  level: string;
-  trainings_this_week: number;
-  total_trainings: number;
-  physical_level: number;
-  days_until_game: number;
+  name: string; position: string; age: number; level: string;
+  trainings_this_week: number; total_trainings: number; physical_level: number; days_until_game: number;
 }
 
 const levelColors: Record<string, string> = {
@@ -83,7 +47,6 @@ const Dashboard = () => {
   useEffect(() => {
     if (authLoading) return;
     if (!user) { navigate("/login"); return; }
-
     let isMounted = true;
 
     const fetchData = async () => {
@@ -176,7 +139,6 @@ const Dashboard = () => {
   };
 
   const handleLogout = async () => { await signOut(); navigate("/"); };
-
   const trainedDays = weekDays.filter(d => d.hasTraining).length;
 
   return (
@@ -186,9 +148,7 @@ const Dashboard = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-surface-2 to-background" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,hsl(145_65%_42%/0.06),transparent_50%)]" />
         <div className="relative flex items-center gap-3 animate-fade-in max-w-md mx-auto">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center text-xl">
-            ⚽
-          </div>
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center text-xl">⚽</div>
           <div className="flex-1">
             <h2 className="font-heading text-lg font-extrabold text-foreground tracking-tight">{profile.name}</h2>
             <p className="text-xs text-muted-foreground">{profile.position} · {profile.age} anos</p>
@@ -215,7 +175,7 @@ const Dashboard = () => {
           <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
             {aiSuggestion
               ? aiSuggestion.description
-              : "Treine com mais direção com base no seu momento, posição e ritmo de evolução."}
+              : "O próximo passo da sua evolução começa na consistência do que você faz agora."}
           </p>
 
           {aiSuggestion?.exercises && (
@@ -229,11 +189,7 @@ const Dashboard = () => {
             </div>
           )}
 
-          <Button
-            onClick={handleStartTraining}
-            disabled={aiLoading}
-            className="w-full h-12 font-heading font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
-          >
+          <Button onClick={handleStartTraining} disabled={aiLoading} className="w-full h-12 font-heading font-bold transition-all hover:scale-[1.02] active:scale-[0.98]">
             Iniciar treino de hoje
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
@@ -242,16 +198,20 @@ const Dashboard = () => {
         {/* === WEEK PROGRESS === */}
         {weekDays.length > 0 && (
           <div className="premium-card rounded-2xl p-4 animate-slide-up" data-tour="week-calendar" style={{ animationDelay: "0.15s" }}>
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-1">
               <div>
                 <p className="section-title text-primary mb-0.5">Sua semana em construção</p>
-                <p className="text-xs text-muted-foreground">{trainedDays}/7 dias com treino</p>
+                <p className="text-[11px] text-muted-foreground">
+                  {trainedDays === 0
+                    ? "Sua evolução depende menos de intensidade isolada e mais de consistência."
+                    : `${trainedDays}/7 dias com treino organizado`}
+                </p>
               </div>
               <button onClick={() => navigate("/calendario")} className="text-xs text-primary font-semibold hover:underline">
-                Ver calendário
+                Calendário
               </button>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between mt-3">
               {weekDays.map(({ date, hasTraining, label, trainingId, trainingTitle }, i) => {
                 const isToday = isSameDay(date, new Date());
                 const dayContent = (
@@ -292,9 +252,9 @@ const Dashboard = () => {
         {/* === STATS === */}
         <div className="grid grid-cols-3 gap-3" data-tour="stats">
           {[
-            { icon: Activity, label: "Treinos semana", value: `${profile.trainings_this_week}/5`, color: "text-primary", bg: "bg-primary/10 border-primary/15" },
-            { icon: Shield, label: "Nível físico", value: `${profile.physical_level}%`, color: "text-accent", bg: "bg-accent/10 border-accent/15" },
-            { icon: Timer, label: "Total sessões", value: `${completedCount}`, color: "text-primary", bg: "bg-primary/10 border-primary/15" },
+            { icon: Activity, label: "Semana", value: `${profile.trainings_this_week}/5`, color: "text-primary", bg: "bg-primary/10 border-primary/15" },
+            { icon: Shield, label: "Nível", value: `${profile.physical_level}%`, color: "text-accent", bg: "bg-accent/10 border-accent/15" },
+            { icon: Timer, label: "Sessões", value: `${completedCount}`, color: "text-primary", bg: "bg-primary/10 border-primary/15" },
           ].map(({ icon: Icon, label, value, color, bg }, i) => (
             <div key={label} className="premium-card rounded-2xl p-3 text-center animate-slide-up" style={{ animationDelay: `${0.2 + i * 0.08}s` }}>
               <div className={cn("w-8 h-8 rounded-lg mx-auto mb-2 flex items-center justify-center border", bg)}>
@@ -308,16 +268,16 @@ const Dashboard = () => {
 
         {/* === EVOLUTION CHART === */}
         <div className="premium-card rounded-2xl p-4 animate-slide-up" style={{ animationDelay: "0.4s" }}>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-1">
             <div>
-              <p className="section-title text-primary mb-0.5">Sua evolução recente</p>
-              <p className="text-xs text-muted-foreground">Acompanhe sua construção ao longo do tempo.</p>
+              <p className="section-title text-primary mb-0.5">Seu processo recente</p>
+              <p className="text-[11px] text-muted-foreground">Acompanhe sua construção e veja onde seu ritmo está avançando.</p>
             </div>
-            <button onClick={() => navigate("/historico")} className="text-xs text-primary font-semibold hover:underline">
-              Histórico
+            <button onClick={() => navigate("/historico")} className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">
+              <TrendingUp className="w-3 h-3" /> Ver mais
             </button>
           </div>
-          <div className="h-28">
+          <div className="h-28 mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
                 <Tooltip
@@ -328,6 +288,20 @@ const Dashboard = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
+        </div>
+
+        {/* === QUICK ACTIONS === */}
+        <div className="grid grid-cols-2 gap-3 animate-slide-up" style={{ animationDelay: "0.5s" }}>
+          <button onClick={() => navigate("/personal")} className="premium-card rounded-2xl p-4 text-left group">
+            <CalendarDays className="w-5 h-5 text-primary mb-2 group-hover:scale-110 transition-transform" />
+            <p className="font-heading text-xs font-bold text-foreground">Plano semanal</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">Organize sua rotina</p>
+          </button>
+          <button onClick={() => navigate("/avaliacao")} className="premium-card rounded-2xl p-4 text-left group">
+            <TrendingUp className="w-5 h-5 text-accent mb-2 group-hover:scale-110 transition-transform" />
+            <p className="font-heading text-xs font-bold text-foreground">Avaliação</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">Seus indicadores</p>
+          </button>
         </div>
       </div>
 
@@ -340,11 +314,11 @@ const Dashboard = () => {
 const DashboardSkeleton = () => (
   <div className="min-h-screen bg-background p-4 space-y-4">
     <div className="h-20 bg-surface-2 rounded-xl animate-pulse" />
-    <div className="h-36 bg-surface-2 rounded-xl animate-pulse" />
+    <div className="h-40 bg-surface-2 rounded-xl animate-pulse" />
     <div className="grid grid-cols-3 gap-3">
       {[1, 2, 3].map((i) => <div key={i} className="h-24 bg-surface-2 rounded-xl animate-pulse" />)}
     </div>
-    <div className="h-40 bg-surface-2 rounded-xl animate-pulse" />
+    <div className="h-36 bg-surface-2 rounded-xl animate-pulse" />
   </div>
 );
 

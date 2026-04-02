@@ -7,7 +7,7 @@ import BottomNav from "@/components/BottomNav";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Loader2, Dumbbell, CalendarPlus, Check } from "lucide-react";
+import { Loader2, Dumbbell, CalendarPlus, Check, Target } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -39,7 +39,7 @@ const PersonalTrainer = () => {
   }, [user, authLoading, navigate]);
 
   const generatePlan = async () => {
-    if (!position || !objective || !level) { toast.error("Preencha todos os campos!"); return; }
+    if (!position || !objective || !level) { toast.error("Preencha todos os campos."); return; }
     setLoading(true); setPlan([]); setRawPlan(""); setScheduledDays(new Set());
     try {
       const result = await callAI(
@@ -74,7 +74,7 @@ const PersonalTrainer = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-surface-2 to-background" />
         <div className="relative max-w-md mx-auto animate-fade-in">
           <h1 className="page-title text-foreground mb-1">Plano semanal orientado</h1>
-          <p className="text-xs text-muted-foreground">Monte uma rotina mais coerente com sua posição, objetivo e nível atual.</p>
+          <p className="text-xs text-muted-foreground">Monte uma rotina mais coerente com sua posição, objetivo e momento atual.</p>
         </div>
       </div>
 
@@ -85,8 +85,23 @@ const PersonalTrainer = () => {
             <ChipSelector label="Objetivo" options={objectives} selected={objective} onSelect={setObjective} />
             <ChipSelector label="Nível" options={levels} selected={level} onSelect={setLevel} />
             <Button onClick={generatePlan} disabled={loading} className="w-full h-12 font-heading font-bold transition-all hover:scale-[1.02] active:scale-[0.98]">
-              {loading ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Gerando plano...</> : "Gerar plano semanal"}
+              {loading ? (
+                <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Montando seu plano...</>
+              ) : (
+                <><Target className="w-5 h-5 mr-2" /> Gerar plano semanal</>
+              )}
             </Button>
+          </div>
+        )}
+
+        {/* Loading state */}
+        {loading && (
+          <div className="text-center py-16 animate-fade-in">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center mx-auto mb-4">
+              <Loader2 className="w-7 h-7 text-primary animate-spin" />
+            </div>
+            <p className="font-heading text-sm font-bold text-foreground mb-1">Construindo seu plano</p>
+            <p className="text-xs text-muted-foreground">Analisando posição, objetivo e nível para montar sua rotina.</p>
           </div>
         )}
 
@@ -102,8 +117,9 @@ const PersonalTrainer = () => {
           </div>
         )}
 
-        {plan.length > 0 && (
+        {plan.length > 0 && !loading && (
           <div className="animate-scale-in space-y-4">
+            {/* Tags */}
             <div className="flex flex-wrap gap-2 mb-1">
               <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-primary/15 text-primary font-semibold">{position}</span>
               <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-highlight/15 text-highlight font-semibold">{objective}</span>

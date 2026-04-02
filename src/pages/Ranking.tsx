@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Trophy, Flame, Medal, Crown, Swords, RefreshCw } from "lucide-react";
+import { Flame, Medal, Crown, Swords, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -26,10 +26,10 @@ function getRankIcon(index: number) {
 }
 
 function getRankBg(index: number) {
-  if (index === 0) return "bg-primary/5 border-primary/20";
-  if (index === 1) return "bg-surface-2 border-border/30";
-  if (index === 2) return "bg-accent/5 border-accent/20";
-  return "bg-surface-1 border-border/20";
+  if (index === 0) return "bg-primary/5 border-primary/15";
+  if (index === 1) return "bg-surface-2 border-border/20";
+  if (index === 2) return "bg-accent/5 border-accent/15";
+  return "bg-surface-1 border-border/15";
 }
 
 const Ranking = () => {
@@ -90,15 +90,15 @@ const Ranking = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20 page-enter">
-      <div className="relative overflow-hidden px-4 pt-6 pb-6">
+      <div className="relative overflow-hidden px-4 pt-6 pb-5">
         <div className="absolute inset-0 bg-gradient-to-b from-surface-2 to-background" />
-        <div className="relative max-w-md mx-auto text-center animate-fade-in">
+        <div className="relative max-w-md mx-auto animate-fade-in">
           <h1 className="page-title text-foreground mb-1">Ranking semanal</h1>
-          <p className="text-xs text-muted-foreground mb-3">Use o ranking como estímulo de consistência.</p>
-          <p className="text-[10px] text-muted-foreground mb-3">
+          <p className="text-xs text-muted-foreground mb-3">A consistência também aparece quando você se compara com ritmo e disciplina.</p>
+          <p className="text-[10px] text-muted-foreground/60 mb-3">
             Semana de {new Date(weekStart).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
           </p>
-          <Button onClick={syncMyScore} size="sm" className="font-semibold">
+          <Button onClick={syncMyScore} size="sm" variant="outline" className="font-semibold">
             <RefreshCw className="w-4 h-4 mr-1.5" /> Atualizar meu score
           </Button>
         </div>
@@ -140,9 +140,9 @@ const Ranking = () => {
           <div className="flex justify-center py-12"><div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" /></div>
         ) : rankings.length === 0 ? (
           <div className="text-center py-12 animate-fade-in">
-            <Swords className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
-            <p className="text-sm text-muted-foreground mb-1">Nenhum ranking ainda esta semana</p>
-            <p className="text-xs text-muted-foreground">Clique em "Atualizar meu score" para entrar.</p>
+            <Swords className="w-10 h-10 mx-auto mb-3 text-muted-foreground/20" />
+            <p className="text-sm text-foreground/80 font-medium mb-1">Nenhum ranking esta semana</p>
+            <p className="text-xs text-muted-foreground">Clique em "Atualizar meu score" para entrar no ranking.</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -150,7 +150,7 @@ const Ranking = () => {
               const isMe = entry.user_id === user?.id;
               const barWidth = maxPoints > 0 ? (entry.total_points / maxPoints) * 100 : 0;
               return (
-                <div key={entry.id} className={cn("rounded-2xl border p-3 transition-all animate-slide-up", getRankBg(i), isMe && "ring-1 ring-primary/30")} style={{ animationDelay: `${i * 0.05}s` }}>
+                <div key={entry.id} className={cn("rounded-2xl border p-3 transition-all animate-slide-up", getRankBg(i), isMe && "ring-1 ring-primary/20")} style={{ animationDelay: `${i * 0.05}s` }}>
                   <div className="flex items-center gap-3">
                     {getRankIcon(i)}
                     <span className="text-xl">{entry.avatar_emoji}</span>
@@ -175,7 +175,7 @@ const Ranking = () => {
         )}
 
         <div className="mt-6 premium-card rounded-2xl p-4 animate-fade-in">
-          <h3 className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">Como funciona a pontuação</h3>
+          <h3 className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">Como funciona</h3>
           <div className="space-y-1.5 text-xs text-muted-foreground">
             <p>Dia treinado = <span className="font-semibold text-foreground">10 pts</span></p>
             <p>Treino completo = <span className="font-semibold text-foreground">5 pts</span></p>
