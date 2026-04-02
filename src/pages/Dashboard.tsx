@@ -228,7 +228,7 @@ const Dashboard = () => {
           ].map(({ icon: Icon, label, value, color }, i) => (
             <div
               key={label}
-              className="gradient-card rounded-xl p-3 border border-border/20 text-center animate-slide-up"
+              className="gradient-card rounded-xl p-3 border border-border/20 text-center animate-slide-up card-hover"
               style={{ animationDelay: `${0.2 + i * 0.1}s` }}
             >
               <Icon className={cn("w-5 h-5 mx-auto mb-1", color)} />
