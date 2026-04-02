@@ -19,49 +19,80 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    let mounted = true;
 
+    // Restore session first
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+    }).catch(() => {
+      if (mounted) setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // Listen for changes — do NOT await anything here
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+      setSession(session);
+      setUser(session?.user ?? null);
+      // Don't call setLoading here — getSession handles initial load
+    });
+
+    // Safety: if auth takes too long, unblock the app
+    const safetyTimeout = setTimeout(() => {
+      if (mounted && loading) setLoading(false);
+    }, 5000);
+
+    return () => {
+      mounted = false;
+      clearTimeout(safetyTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email: string, password: string, meta: { name: string; position: string; age: number; objective?: string }) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { name: meta.name } },
-    });
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { name: meta.name } },
+      });
 
-    if (!error && data.user) {
-      // Wait a moment for the trigger to create the profile
-      await new Promise((r) => setTimeout(r, 500));
-      await supabase.from("profiles").update({
-        name: meta.name,
-        position: meta.position,
-        age: meta.age,
-        objective: meta.objective || "",
-      }).eq("user_id", data.user.id);
+      if (!error && data.user) {
+        // Wait a moment for the trigger to create the profile
+        await new Promise((r) => setTimeout(r, 500));
+        await supabase.from("profiles").update({
+          name: meta.name,
+          position: meta.position,
+          age: meta.age,
+          objective: meta.objective || "",
+        }).eq("user_id", data.user.id);
+      }
+
+      return { error };
+    } catch (err) {
+      return { error: err };
     }
-
-    return { error };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error };
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      return { error };
+    } catch (err) {
+      return { error: err };
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // Force clear local state even if signOut fails
+      setUser(null);
+      setSession(null);
+    }
   };
 
   return (
