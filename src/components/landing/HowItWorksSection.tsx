@@ -17,7 +17,7 @@ const steps = [
   {
     icon: CalendarDays,
     number: "03",
-    title: "Organize seus treinos da semana",
+    title: "Organize sua semana de treino",
     desc: "Monte sua rotina semanal com mais estrutura e menos improviso.",
   },
   {
