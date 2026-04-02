@@ -30,9 +30,9 @@ function getWeekStart(): string {
 }
 
 function getRankIcon(index: number) {
-  if (index === 0) return <Crown className="w-5 h-5 text-yellow-400" />;
-  if (index === 1) return <Medal className="w-5 h-5 text-gray-300" />;
-  if (index === 2) return <Medal className="w-5 h-5 text-amber-600" />;
+  if (index === 0) return <Crown className="w-5 h-5 text-primary" />;
+  if (index === 1) return <Medal className="w-5 h-5 text-muted-foreground" />;
+  if (index === 2) return <Medal className="w-5 h-5 text-accent-foreground" />;
   return <span className="text-xs font-bold text-muted-foreground w-5 text-center">{index + 1}º</span>;
 }
 
