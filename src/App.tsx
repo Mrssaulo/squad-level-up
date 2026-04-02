@@ -45,6 +45,7 @@ const App = () => {
               <Route path="/training-complete" element={<TrainingComplete />} />
               <Route path="/historico" element={<Historico />} />
               <Route path="/calendario" element={<Calendario />} />
+              <Route path="/ranking" element={<Ranking />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <FloatingChat />
