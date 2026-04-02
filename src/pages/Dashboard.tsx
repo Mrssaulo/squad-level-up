@@ -221,7 +221,7 @@ const Dashboard = () => {
 
         {/* Week Summary */}
         {weekDays.length > 0 && (
-          <div className="gradient-card rounded-2xl p-4 border border-border/20 animate-slide-up card-hover" style={{ animationDelay: "0.15s" }}>
+          <div className="gradient-card rounded-2xl p-4 border border-border/20 animate-slide-up card-hover" data-tour="week-calendar" style={{ animationDelay: "0.15s" }}>
             <div className="flex items-center gap-3 mb-3">
               <div className="icon-container-accent">
                 <CalendarDays className="w-4 h-4 text-accent" />
