@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
-import { Activity, Timer, Shield, Trophy, LogOut, Brain, Loader2, CalendarDays } from "lucide-react";
+import { Activity, Timer, Shield, Trophy, LogOut, Brain, Loader2, CalendarDays, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
 import { cn } from "@/lib/utils";
