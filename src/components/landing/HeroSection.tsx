@@ -77,7 +77,7 @@ const HeroSection = () => {
               </div>
 
               <p className="text-muted-foreground text-sm">
-                Sem complicação. Sem treino aleatório. Mais direção para evoluir.
+                Sem treino aleatório. Sem rotina solta. Mais direção para evoluir.
               </p>
             </div>
 

@@ -5,7 +5,7 @@ const steps = [
   {
     icon: UserPlus,
     number: "01",
-    title: "Crie sua conta e defina seu perfil",
+    title: "Monte seu perfil no app",
     desc: "Informe sua posição, nível e objetivo para receber orientação personalizada.",
   },
   {
@@ -17,13 +17,13 @@ const steps = [
   {
     icon: CalendarDays,
     number: "03",
-    title: "Organize seus treinos da semana",
+    title: "Organize sua semana de treino",
     desc: "Monte sua rotina semanal com mais estrutura e menos improviso.",
   },
   {
     icon: BarChart3,
     number: "04",
-    title: "Acompanhe sua evolução e mantenha consistência",
+    title: "Acompanhe sua evolução com mais consistência",
     desc: "Visualize seu progresso e transforme treino em processo contínuo.",
   },
 ];

@@ -5,12 +5,12 @@ const pillars = [
   {
     icon: Shield,
     title: "Treino por posição",
-    desc: "Receba orientações mais coerentes com a exigência real da sua função em campo.",
+    desc: "Mais coerência com a exigência real da sua função em campo.",
   },
   {
     icon: Calendar,
     title: "Plano semanal",
-    desc: "Organize sua rotina com mais consistência, sem depender de improviso.",
+    desc: "Uma rotina organizada para reduzir improviso e aumentar consistência.",
   },
   {
     icon: TrendingUp,
@@ -20,7 +20,7 @@ const pillars = [
   {
     icon: Lightbulb,
     title: "Apoio inteligente",
-    desc: "Use a IA como suporte para orientar decisões, tirar dúvidas e ajustar foco.",
+    desc: "Receba orientação complementar para ajustar foco, rotina e entendimento.",
   },
 ];
 
@@ -34,10 +34,10 @@ const ProposalSection = () => {
             <p className="section-title text-primary mb-3">A proposta</p>
             <h2 className="font-heading text-3xl md:text-4xl lg:text-[2.75rem] font-extrabold text-foreground leading-tight tracking-tight">
               Um sistema de evolução{" "}
-              <span className="text-gradient">pensado para futebol.</span>
+              <span className="text-gradient">pensado para a evolução do atleta.</span>
             </h2>
             <p className="text-muted-foreground text-base md:text-lg mt-5 max-w-2xl mx-auto leading-relaxed">
-              O Pro Futebol SM foi desenhado para transformar treino solto em rotina estruturada. Você entende o que fazer, acompanha sua evolução e treina de acordo com a sua posição e seu momento.
+              O Pro Futebol SM transforma treino solto em processo estruturado. Você entende melhor seu momento, organiza sua semana e treina com mais coerência para evoluir no futebol.
             </p>
           </div>
         </FadeInSection>
