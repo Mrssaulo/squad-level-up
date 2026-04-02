@@ -5,9 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
 import OnboardingTour, { type TourStep } from "@/components/OnboardingTour";
-import { Activity, Timer, Shield, Trophy, LogOut, Brain, Loader2, CalendarDays, Flame } from "lucide-react";
+import { Activity, Timer, Shield, Trophy, LogOut, Brain, Loader2, CalendarDays, Flame, Eye, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { format, startOfWeek, addDays, isSameDay } from "date-fns";
@@ -76,7 +77,7 @@ const Dashboard = () => {
   const [completedCount, setCompletedCount] = useState(0);
   const [aiSuggestion, setAiSuggestion] = useState<{ title: string; description: string; exercises: any[] } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
-  const [weekDays, setWeekDays] = useState<{ date: Date; hasTraining: boolean; label: string }[]>([]);
+  const [weekDays, setWeekDays] = useState<{ date: Date; hasTraining: boolean; label: string; trainingId?: string; trainingTitle?: string }[]>([]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -101,20 +102,22 @@ const Dashboard = () => {
       const weekEnd = addDays(weekStart, 6);
       const { data: scheduled } = await supabase
         .from("scheduled_trainings")
-        .select("scheduled_date, status")
+        .select("id, scheduled_date, status, training_title")
         .eq("user_id", user.id)
         .gte("scheduled_date", format(weekStart, "yyyy-MM-dd"))
         .lte("scheduled_date", format(weekEnd, "yyyy-MM-dd"));
 
       const days = Array.from({ length: 7 }, (_, i) => {
         const date = addDays(weekStart, i);
-        const hasTraining = (scheduled || []).some(
+        const match = (scheduled || []).find(
           (s: any) => isSameDay(new Date(s.scheduled_date + "T12:00:00"), date)
         );
         return {
           date,
-          hasTraining,
+          hasTraining: !!match,
           label: format(date, "EEE", { locale: ptBR }).slice(0, 3),
+          trainingId: match?.id,
+          trainingTitle: match?.training_title,
         };
       });
       setWeekDays(days);
@@ -164,6 +167,27 @@ const Dashboard = () => {
         position: profile.position,
       },
     });
+  };
+
+  const removeScheduledTraining = async (trainingId: string) => {
+    if (!user) return;
+    const { error } = await supabase
+      .from("scheduled_trainings")
+      .delete()
+      .eq("id", trainingId)
+      .eq("user_id", user.id);
+    if (error) {
+      toast.error("Erro ao remover treino");
+      return;
+    }
+    setWeekDays((prev) =>
+      prev.map((d) =>
+        d.trainingId === trainingId
+          ? { ...d, hasTraining: false, trainingId: undefined, trainingTitle: undefined }
+          : d
+      )
+    );
+    toast.success("Treino removido com sucesso!");
   };
 
   const handleLogout = async () => {
@@ -238,14 +262,10 @@ const Dashboard = () => {
               <h3 className="section-title">Semana</h3>
             </div>
             <div className="flex justify-between">
-              {weekDays.map(({ date, hasTraining, label }, i) => {
+              {weekDays.map(({ date, hasTraining, label, trainingId, trainingTitle }, i) => {
                 const isToday = isSameDay(date, new Date());
-                return (
-                  <button
-                    key={i}
-                    onClick={() => navigate("/calendario")}
-                    className="flex flex-col items-center gap-1"
-                  >
+                const dayContent = (
+                  <div className="flex flex-col items-center gap-1">
                     <span className={cn(
                       "text-[10px] font-medium uppercase",
                       isToday ? "text-primary" : "text-muted-foreground"
@@ -267,7 +287,44 @@ const Dashboard = () => {
                     {hasTraining && (
                       <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                     )}
-                  </button>
+                  </div>
+                );
+
+                if (!hasTraining) {
+                  return (
+                    <button key={i} onClick={() => navigate("/calendario")} className="flex flex-col items-center gap-1">
+                      {dayContent}
+                    </button>
+                  );
+                }
+
+                return (
+                  <Popover key={i}>
+                    <PopoverTrigger asChild>
+                      <button className="flex flex-col items-center gap-1">
+                        {dayContent}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-44 p-2" side="top" align="center">
+                      {trainingTitle && (
+                        <p className="text-xs font-medium text-foreground mb-2 px-1 truncate">{trainingTitle}</p>
+                      )}
+                      <button
+                        onClick={() => navigate("/calendario")}
+                        className="flex items-center gap-2 w-full px-2 py-1.5 text-sm rounded-md hover:bg-muted transition-colors"
+                      >
+                        <Eye className="w-3.5 h-3.5 text-primary" />
+                        <span>Ver treino</span>
+                      </button>
+                      <button
+                        onClick={() => trainingId && removeScheduledTraining(trainingId)}
+                        className="flex items-center gap-2 w-full px-2 py-1.5 text-sm rounded-md hover:bg-destructive/10 text-destructive transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Remover treino</span>
+                      </button>
+                    </PopoverContent>
+                  </Popover>
                 );
               })}
             </div>
