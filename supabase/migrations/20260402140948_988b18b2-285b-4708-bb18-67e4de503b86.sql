@@ -1,0 +1,1 @@
+select public.is_admin_email();
