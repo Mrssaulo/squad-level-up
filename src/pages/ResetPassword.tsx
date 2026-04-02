@@ -54,8 +54,9 @@ const ResetPassword = () => {
         toast.error(error.message);
         return;
       }
-      toast.success("Senha redefinida com sucesso!");
-      navigate("/dashboard");
+      toast.success("Senha redefinida com sucesso! Faça login com sua nova senha.");
+      await supabase.auth.signOut();
+      navigate("/login");
     } finally {
       setLoading(false);
     }
