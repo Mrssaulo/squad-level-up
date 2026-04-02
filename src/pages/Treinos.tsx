@@ -139,7 +139,7 @@ const Treinos = () => {
             return (
               <div
                 key={training.id}
-                className="gradient-card rounded-xl border border-border/20 overflow-hidden transition-all duration-300 animate-slide-up cursor-pointer"
+                className="gradient-card rounded-2xl border border-border/20 overflow-hidden transition-all duration-300 animate-slide-up cursor-pointer card-hover"
                 style={{ animationDelay: `${i * 0.05}s` }}
                 onClick={() => setExpanded(isExpanded ? null : training.id)}
               >
