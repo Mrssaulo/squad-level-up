@@ -3,11 +3,11 @@ import { Home, Dumbbell, User, Brain, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { path: "/dashboard", label: "Início", icon: Home },
-  { path: "/treinos", label: "Treinos", icon: Dumbbell },
-  { path: "/ranking", label: "Ranking", icon: Trophy },
-  { path: "/personal", label: "Coach IA", icon: Brain },
-  { path: "/avaliacao", label: "Perfil", icon: User },
+  { path: "/dashboard", label: "Início", icon: Home, tourId: "nav-home" },
+  { path: "/treinos", label: "Treinos", icon: Dumbbell, tourId: "nav-treinos" },
+  { path: "/ranking", label: "Ranking", icon: Trophy, tourId: "nav-ranking" },
+  { path: "/personal", label: "Coach IA", icon: Brain, tourId: "nav-coach" },
+  { path: "/avaliacao", label: "Perfil", icon: User, tourId: "nav-perfil" },
 ];
 
 const BottomNav = () => {
