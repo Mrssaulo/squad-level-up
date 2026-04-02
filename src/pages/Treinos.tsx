@@ -72,9 +72,10 @@ const Treinos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="px-4 pt-6 max-w-md mx-auto">
-        <h1 className="font-heading text-xl font-bold mb-4 animate-fade-in">Biblioteca de Treinos</h1>
+    <div className="min-h-screen bg-background pb-20 page-enter">
+      <div className="gradient-header relative overflow-hidden px-4 pt-6 pb-8">
+        <div className="gradient-header-accent absolute inset-0 pointer-events-none" />
+        <h1 className="page-title text-foreground mb-4 animate-fade-in relative">Biblioteca de Treinos</h1>
 
         <div className="relative mb-4 animate-fade-in">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
