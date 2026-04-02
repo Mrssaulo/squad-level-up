@@ -26,6 +26,12 @@ function parseSuggestions(content: string): { cleanContent: string; suggestions:
   return { cleanContent, suggestions };
 }
 
+const QUICK_PROMPTS = [
+  "Como posso melhorar meu posicionamento?",
+  "Sugestão de aquecimento para hoje",
+  "Como manter consistência na semana?",
+];
+
 const FloatingChat = () => {
   const { user } = useAuth();
   const location = window.location.pathname;
@@ -142,7 +148,7 @@ const FloatingChat = () => {
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
               <Button size="sm" variant="outline" className="w-full mb-2" onClick={startNewChat}>+ Nova conversa</Button>
               {loadingHistory && <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>}
-              {!loadingHistory && conversations.length === 0 && <p className="text-center text-muted-foreground text-xs py-8">Nenhuma conversa ainda</p>}
+              {!loadingHistory && conversations.length === 0 && <p className="text-center text-muted-foreground text-xs py-8">Nenhuma conversa ainda.</p>}
               {conversations.map((conv) => {
                 const Icon = categoryIcons[conv.category] || Dumbbell;
                 const color = categoryColors[conv.category] || "text-primary";
@@ -167,10 +173,17 @@ const FloatingChat = () => {
             <>
               <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-3">
                 {messages.length === 0 && (
-                  <div className="text-center text-muted-foreground text-xs py-8">
-                    <Bot className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                  <div className="text-center text-muted-foreground text-xs py-6">
+                    <Bot className="w-8 h-8 mx-auto mb-2 opacity-20" />
                     <p className="font-medium text-foreground/70 mb-1">Coach de apoio</p>
-                    <p>Use o coach para tirar dúvidas, ajustar foco e manter clareza no seu processo.</p>
+                    <p className="mb-4">Tire dúvidas, ajuste foco e use o coach como suporte para manter clareza no seu processo.</p>
+                    <div className="space-y-1.5">
+                      {QUICK_PROMPTS.map((prompt) => (
+                        <button key={prompt} onClick={() => send(prompt)} className="block w-full text-left text-[11px] px-3 py-2 rounded-lg bg-surface-2 text-foreground/70 hover:bg-surface-3 transition-colors">
+                          {prompt}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
                 {messages.map((m, i) => {

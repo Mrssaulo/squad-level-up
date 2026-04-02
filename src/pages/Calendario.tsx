@@ -7,7 +7,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Play, Pencil, Trash2, X, Plus, Minus } from "lucide-react";
+import { Play, Pencil, Trash2, X, Plus, Minus, CalendarDays } from "lucide-react";
 import { format, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
@@ -78,7 +78,7 @@ const Calendario = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-surface-2 to-background" />
         <div className="relative max-w-md mx-auto animate-fade-in">
           <h1 className="page-title text-foreground mb-1">Calendário de treinos</h1>
-          <p className="text-xs text-muted-foreground">Visualize sua rotina, organize seus dias e mantenha consistência.</p>
+          <p className="text-xs text-muted-foreground">Visualize sua rotina, mantenha constância e organize sua preparação.</p>
         </div>
       </div>
 
@@ -99,7 +99,14 @@ const Calendario = () => {
             </h2>
 
             {selectedDayTrainings.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground text-sm">Nenhum treino agendado para este dia</div>
+              <div className="text-center py-10 animate-fade-in">
+                <CalendarDays className="w-10 h-10 mx-auto mb-3 text-muted-foreground/20" />
+                <p className="text-sm text-muted-foreground mb-1">Nenhum treino neste dia</p>
+                <p className="text-xs text-muted-foreground/60">Sua semana ainda não foi organizada. Monte sua rotina no plano semanal.</p>
+                <Button size="sm" variant="outline" className="mt-4 font-semibold" onClick={() => navigate("/personal")}>
+                  Montar plano semanal
+                </Button>
+              </div>
             ) : (
               <div className="space-y-3">
                 {selectedDayTrainings.map((training) => (

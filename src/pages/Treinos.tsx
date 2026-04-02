@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, Check, User, Play } from "lucide-react";
+import { Search, Plus, Check, User, Play, Dumbbell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -31,7 +31,6 @@ const Treinos = () => {
   useEffect(() => {
     if (authLoading) return;
     if (!user) { navigate("/login"); return; }
-
     const fetchData = async () => {
       const [{ data: completed }, { data: profile }] = await Promise.all([
         supabase.from("completed_trainings").select("training_id").eq("user_id", user.id),
@@ -52,7 +51,7 @@ const Treinos = () => {
 
   const addToPlan = async (training: Training) => {
     if (!user) return;
-    if (completedIds.includes(training.id)) { toast.info("Treino já está na sua rotina!"); return; }
+    if (completedIds.includes(training.id)) { toast.info("Treino já está na sua rotina."); return; }
     const { error } = await supabase.from("completed_trainings").insert({ user_id: user.id, training_id: training.id });
     if (error) { toast.error("Erro ao salvar treino"); return; }
     setCompletedIds([...completedIds, training.id]);
@@ -67,17 +66,12 @@ const Treinos = () => {
         <div className="relative max-w-md mx-auto">
           <div className="mb-4 animate-fade-in">
             <h1 className="page-title text-foreground mb-1">Biblioteca de treinos</h1>
-            <p className="text-xs text-muted-foreground">Escolha treinos com mais coerência para sua posição, rotina e objetivo.</p>
+            <p className="text-xs text-muted-foreground">Encontre treinos mais coerentes com sua posição, seu objetivo e sua rotina.</p>
           </div>
 
           <div className="relative mb-4 animate-fade-in">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar treino..."
-              className="pl-9 bg-surface-2 border-border/50 h-11"
-            />
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar treino..." className="pl-9 bg-surface-2 border-border/50 h-11" />
           </div>
 
           {/* Position filter */}
@@ -88,16 +82,10 @@ const Treinos = () => {
             </div>
             <div className="flex gap-1.5 overflow-x-auto pb-2 scrollbar-hide">
               {positionFilters.map((pos) => (
-                <button
-                  key={pos}
-                  onClick={() => setPosFilter(pos)}
-                  className={cn(
-                    "px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all",
-                    posFilter === pos ? "bg-accent text-accent-foreground" : "bg-surface-2 text-muted-foreground hover:bg-surface-3"
-                  )}
-                >
-                  {pos}
-                </button>
+                <button key={pos} onClick={() => setPosFilter(pos)} className={cn(
+                  "px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all",
+                  posFilter === pos ? "bg-accent text-accent-foreground" : "bg-surface-2 text-muted-foreground hover:bg-surface-3"
+                )}>{pos}</button>
               ))}
             </div>
           </div>
@@ -105,16 +93,10 @@ const Treinos = () => {
           {/* Category filter */}
           <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide animate-fade-in">
             {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setFilter(cat)}
-                className={cn(
-                  "px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all",
-                  filter === cat ? "bg-primary text-primary-foreground" : "bg-surface-2 text-muted-foreground hover:bg-surface-3"
-                )}
-              >
-                {cat}
-              </button>
+              <button key={cat} onClick={() => setFilter(cat)} className={cn(
+                "px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all",
+                filter === cat ? "bg-primary text-primary-foreground" : "bg-surface-2 text-muted-foreground hover:bg-surface-3"
+              )}>{cat}</button>
             ))}
           </div>
         </div>
@@ -122,7 +104,11 @@ const Treinos = () => {
 
       <div className="px-4 max-w-md mx-auto space-y-3 -mt-1">
         {filtered.length === 0 && (
-          <p className="text-center text-muted-foreground text-sm py-8">Nenhum treino encontrado para esses filtros.</p>
+          <div className="text-center py-12 animate-fade-in">
+            <Dumbbell className="w-12 h-12 mx-auto mb-3 text-muted-foreground/20" />
+            <p className="text-muted-foreground text-sm mb-1">Nenhum treino encontrado</p>
+            <p className="text-muted-foreground/60 text-xs">Ajuste os filtros para encontrar treinos compatíveis com seu perfil.</p>
+          </div>
         )}
         {filtered.map((training, i) => {
           const isExpanded = expanded === training.id;
@@ -173,7 +159,7 @@ const Treinos = () => {
                     className={cn("w-full font-semibold transition-all hover:scale-[1.02]", inPlan ? "bg-muted text-muted-foreground" : "")}
                     disabled={inPlan}
                   >
-                    {inPlan ? <><Check className="w-4 h-4 mr-1" /> Na rotina</> : <><Plus className="w-4 h-4 mr-1" /> Adicionar à rotina</>}
+                    {inPlan ? <><Check className="w-4 h-4 mr-1" /> Na rotina</> : <><Plus className="w-4 h-4 mr-1" /> Adicionar ao plano</>}
                   </Button>
                 </div>
               )}
