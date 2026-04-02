@@ -78,3 +78,40 @@
     -webkit-text-fill-color: transparent;
   }
 }
+
+/* Button press effect */
+button, [role="button"] {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+button:active:not(:disabled), [role="button"]:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px hsl(142 72% 37% / 0.15);
+  border-color: hsl(142 72% 37% / 0.3);
+}
+
+/* Page transition */
+.page-enter {
+  animation: fade-in 0.35s ease-out, slide-up 0.35s ease-out;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(var(--muted)); border-radius: 4px; }
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

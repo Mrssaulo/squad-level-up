@@ -123,7 +123,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 page-enter">
       <div className="gradient-field px-4 pt-6 pb-8">
         <div className="flex items-center gap-3 animate-fade-in">
           <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center text-2xl border-2 border-primary/50">
@@ -144,7 +144,7 @@ const Dashboard = () => {
 
       <div className="px-4 -mt-4 space-y-4 max-w-md mx-auto">
         {/* AI Training Suggestion */}
-        <div className="gradient-card rounded-xl p-5 border border-border/30 animate-slide-up" style={{ animationDelay: "0.1s" }}>
+        <div className="gradient-card rounded-xl p-5 border border-border/30 animate-slide-up card-hover" style={{ animationDelay: "0.1s" }}>
           <div className="flex items-center gap-2 mb-3">
             {aiLoading ? <Loader2 className="w-5 h-5 text-primary animate-spin" /> : <Brain className="w-5 h-5 text-primary" />}
             <h3 className="font-heading text-base font-bold">
@@ -228,7 +228,7 @@ const Dashboard = () => {
           ].map(({ icon: Icon, label, value, color }, i) => (
             <div
               key={label}
-              className="gradient-card rounded-xl p-3 border border-border/20 text-center animate-slide-up"
+              className="gradient-card rounded-xl p-3 border border-border/20 text-center animate-slide-up card-hover"
               style={{ animationDelay: `${0.2 + i * 0.1}s` }}
             >
               <Icon className={cn("w-5 h-5 mx-auto mb-1", color)} />
@@ -239,7 +239,7 @@ const Dashboard = () => {
         </div>
 
         {/* Chart */}
-        <div className="gradient-card rounded-xl p-4 border border-border/20 animate-slide-up" style={{ animationDelay: "0.5s" }}>
+        <div className="gradient-card rounded-xl p-4 border border-border/20 animate-slide-up card-hover" style={{ animationDelay: "0.5s" }}>
           <div className="flex items-center gap-2 mb-3">
             <Trophy className="w-4 h-4 text-highlight" />
             <h3 className="font-heading text-sm font-bold">Evolução — 30 dias</h3>
