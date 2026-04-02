@@ -19,6 +19,7 @@ import Calendario from "./pages/Calendario";
 import Ranking from "./pages/Ranking";
 import FloatingChat from "./components/FloatingChat";
 import NotFound from "./pages/NotFound";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
