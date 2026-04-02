@@ -72,111 +72,114 @@ const Treinos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="px-4 pt-6 max-w-md mx-auto">
-        <h1 className="font-heading text-xl font-bold mb-4 animate-fade-in">Biblioteca de Treinos</h1>
+    <div className="min-h-screen bg-background pb-20 page-enter">
+      <div className="gradient-header relative overflow-hidden px-4 pt-6 pb-6">
+        <div className="gradient-header-accent absolute inset-0 pointer-events-none" />
+        <div className="relative max-w-md mx-auto">
+          <h1 className="page-title text-foreground mb-4 animate-fade-in">Biblioteca de Treinos</h1>
 
-        <div className="relative mb-4 animate-fade-in">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar treino..."
-            className="pl-9 bg-muted/50 border-border/50 h-11"
-          />
-        </div>
-
-        {/* Position filter */}
-        <div className="mb-3 animate-fade-in">
-          <div className="flex items-center gap-1.5 mb-2">
-            <User className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Posição</span>
+          <div className="relative mb-4 animate-fade-in">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar treino..."
+              className="pl-9 bg-muted/50 border-border/50 h-11"
+            />
           </div>
-          <div className="flex gap-1.5 overflow-x-auto pb-2 scrollbar-hide">
-            {positionFilters.map((pos) => (
+
+          {/* Position filter */}
+          <div className="mb-3 animate-fade-in">
+            <div className="flex items-center gap-1.5 mb-2">
+              <User className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="section-title">Posição</span>
+            </div>
+            <div className="flex gap-1.5 overflow-x-auto pb-2 scrollbar-hide">
+              {positionFilters.map((pos) => (
+                <button
+                  key={pos}
+                  onClick={() => setPosFilter(pos)}
+                  className={cn(
+                    "px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all",
+                    posFilter === pos
+                      ? "bg-accent text-accent-foreground"
+                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  {pos}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Category filter */}
+          <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide animate-fade-in">
+            {categories.map((cat) => (
               <button
-                key={pos}
-                onClick={() => setPosFilter(pos)}
+                key={cat}
+                onClick={() => setFilter(cat)}
                 className={cn(
-                  "px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all",
-                  posFilter === pos
-                    ? "bg-highlight text-highlight-foreground"
+                  "px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all",
+                  filter === cat
+                    ? "bg-primary text-primary-foreground"
                     : "bg-muted/50 text-muted-foreground hover:bg-muted"
                 )}
               >
-                {pos}
+                {cat}
               </button>
             ))}
           </div>
         </div>
+      </div>
 
-        {/* Category filter */}
-        <div className="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide animate-fade-in">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setFilter(cat)}
-              className={cn(
-                "px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all",
-                filter === cat
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted/50 text-muted-foreground hover:bg-muted"
-              )}
+      <div className="px-4 max-w-md mx-auto space-y-3 -mt-2">
+        {filtered.length === 0 && (
+          <p className="text-center text-muted-foreground text-sm py-8">Nenhum treino encontrado para esses filtros.</p>
+        )}
+        {filtered.map((training, i) => {
+          const isExpanded = expanded === training.id;
+          const inPlan = completedIds.includes(training.id);
+          return (
+            <div
+              key={training.id}
+              className="gradient-card rounded-2xl border border-border/20 overflow-hidden transition-all duration-300 animate-slide-up cursor-pointer card-hover"
+              style={{ animationDelay: `${i * 0.05}s` }}
+              onClick={() => setExpanded(isExpanded ? null : training.id)}
             >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        <div className="space-y-3">
-          {filtered.length === 0 && (
-            <p className="text-center text-muted-foreground text-sm py-8">Nenhum treino encontrado para esses filtros.</p>
-          )}
-          {filtered.map((training, i) => {
-            const isExpanded = expanded === training.id;
-            const inPlan = completedIds.includes(training.id);
-            return (
-              <div
-                key={training.id}
-                className="gradient-card rounded-xl border border-border/20 overflow-hidden transition-all duration-300 animate-slide-up cursor-pointer"
-                style={{ animationDelay: `${i * 0.05}s` }}
-                onClick={() => setExpanded(isExpanded ? null : training.id)}
-              >
-                <div className="p-4 flex items-center gap-3">
-                  <span className="text-2xl">{training.thumbnail}</span>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-heading text-sm font-bold truncate">{training.title}</h3>
-                    <p className="text-xs text-muted-foreground">{training.duration}</p>
-                  </div>
-                  <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold", difficultyColors[training.difficulty])}>
-                    {training.difficulty}
-                  </span>
+              <div className="p-4 flex items-center gap-3">
+                <span className="text-2xl">{training.thumbnail}</span>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-heading text-sm font-bold truncate">{training.title}</h3>
+                  <p className="text-xs text-muted-foreground">{training.duration}</p>
                 </div>
-                {isExpanded && (
-                  <div className="px-4 pb-4 animate-fade-in">
-                    <p className="text-sm text-muted-foreground mb-2">{training.description}</p>
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {training.positions.map((pos) => (
-                        <span key={pos} className="text-[10px] px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">{pos}</span>
-                      ))}
-                    </div>
-                    <Button
-                      size="sm"
-                      onClick={(e) => { e.stopPropagation(); addToPlan(training); }}
-                      className={cn(
-                        "w-full font-semibold transition-all hover:scale-[1.02]",
-                        inPlan ? "bg-muted text-muted-foreground" : "bg-primary hover:bg-primary/90"
-                      )}
-                      disabled={inPlan}
-                    >
-                      {inPlan ? <><Check className="w-4 h-4 mr-1" /> No plano</> : <><Plus className="w-4 h-4 mr-1" /> Adicionar ao plano</>}
-                    </Button>
-                  </div>
-                )}
+                <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold", difficultyColors[training.difficulty])}>
+                  {training.difficulty}
+                </span>
               </div>
-            );
-          })}
-        </div>
+              {isExpanded && (
+                <div className="px-4 pb-4 animate-fade-in">
+                  <p className="text-sm text-muted-foreground mb-2">{training.description}</p>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {training.positions.map((pos) => (
+                      <span key={pos} className="text-[10px] px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">{pos}</span>
+                    ))}
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={(e) => { e.stopPropagation(); addToPlan(training); }}
+                    className={cn(
+                      "w-full font-semibold transition-all hover:scale-[1.02]",
+                      inPlan ? "bg-muted text-muted-foreground" : "bg-primary hover:bg-primary/90"
+                    )}
+                    disabled={inPlan}
+                  >
+                    {inPlan ? <><Check className="w-4 h-4 mr-1" /> No plano</> : <><Plus className="w-4 h-4 mr-1" /> Adicionar ao plano</>}
+                  </Button>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
       <BottomNav />
     </div>

@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
-import { Activity, Timer, Shield, Trophy, LogOut, Brain, Loader2, CalendarDays } from "lucide-react";
+import { Activity, Timer, Shield, Trophy, LogOut, Brain, Loader2, CalendarDays, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
 import { cn } from "@/lib/utils";
@@ -124,16 +124,17 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20 page-enter">
-      <div className="gradient-field px-4 pt-6 pb-8">
-        <div className="flex items-center gap-3 animate-fade-in">
-          <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center text-2xl border-2 border-primary/50">
+      <div className="gradient-header relative overflow-hidden px-4 pt-6 pb-10">
+        <div className="gradient-header-accent absolute inset-0 pointer-events-none" />
+        <div className="relative flex items-center gap-3 animate-fade-in">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-2xl border border-primary/30 shadow-lg shadow-primary/10">
             ⚽
           </div>
           <div className="flex-1">
-            <h2 className="font-heading text-lg font-bold text-foreground">{profile.name}</h2>
+            <h2 className="font-heading text-xl font-extrabold text-foreground tracking-tight">{profile.name}</h2>
             <p className="text-sm text-muted-foreground">{profile.position} • {profile.age} anos</p>
           </div>
-          <span className={cn("px-3 py-1 rounded-full text-xs font-bold", levelColors[profile.level] || levelColors.Iniciante)}>
+          <span className={cn("px-3 py-1 rounded-full text-xs font-bold border", levelColors[profile.level] || levelColors.Iniciante)}>
             {profile.level === "Estrela" && "⭐ "}{profile.level}
           </span>
           <button onClick={handleLogout} className="text-muted-foreground hover:text-foreground transition-colors">
@@ -142,13 +143,15 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="px-4 -mt-4 space-y-4 max-w-md mx-auto">
+      <div className="px-4 -mt-6 space-y-4 max-w-md mx-auto">
         {/* AI Training Suggestion */}
-        <div className="gradient-card rounded-xl p-5 border border-border/30 animate-slide-up card-hover" style={{ animationDelay: "0.1s" }}>
-          <div className="flex items-center gap-2 mb-3">
-            {aiLoading ? <Loader2 className="w-5 h-5 text-primary animate-spin" /> : <Brain className="w-5 h-5 text-primary" />}
-            <h3 className="font-heading text-base font-bold">
-              {aiSuggestion ? "🧠 Treino sugerido pela IA" : "Treino de hoje"}
+        <div className="gradient-card rounded-2xl p-5 border border-border/30 animate-slide-up card-hover shadow-lg shadow-black/20" style={{ animationDelay: "0.1s" }}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="icon-container">
+              {aiLoading ? <Loader2 className="w-5 h-5 text-primary animate-spin" /> : <Brain className="w-5 h-5 text-primary" />}
+            </div>
+            <h3 className="font-heading text-base font-extrabold tracking-tight">
+              {aiSuggestion ? "Treino sugerido pela IA" : "Treino de hoje"}
             </h3>
           </div>
           <p className="text-sm text-muted-foreground mb-2">
@@ -169,18 +172,21 @@ const Dashboard = () => {
           )}
           <Button
             onClick={handleStartTraining}
-            className="w-full h-12 font-heading font-bold bg-primary hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full h-12 font-heading font-extrabold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-primary/20"
           >
-            🔥 Iniciar aquecimento
+            <Flame className="w-5 h-5 mr-2" />
+            Iniciar aquecimento
           </Button>
         </div>
 
         {/* Week Summary */}
         {weekDays.length > 0 && (
-          <div className="gradient-card rounded-xl p-4 border border-border/20 animate-slide-up" style={{ animationDelay: "0.15s" }}>
-            <div className="flex items-center gap-2 mb-3">
-              <CalendarDays className="w-4 h-4 text-highlight" />
-              <h3 className="font-heading text-sm font-bold">Semana</h3>
+          <div className="gradient-card rounded-2xl p-4 border border-border/20 animate-slide-up card-hover" style={{ animationDelay: "0.15s" }}>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="icon-container-accent">
+                <CalendarDays className="w-4 h-4 text-accent" />
+              </div>
+              <h3 className="section-title">Semana</h3>
             </div>
             <div className="flex justify-between">
               {weekDays.map(({ date, hasTraining, label }, i) => {
@@ -222,27 +228,31 @@ const Dashboard = () => {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
           {[
-            { icon: Activity, label: "Treinos semana", value: `${profile.trainings_this_week}/5`, color: "text-primary" },
-            { icon: Shield, label: "Nível físico", value: `${profile.physical_level}%`, color: "text-highlight" },
-            { icon: Timer, label: "Treinos total", value: `${completedCount}`, color: "text-primary" },
-          ].map(({ icon: Icon, label, value, color }, i) => (
+            { icon: Activity, label: "Treinos semana", value: `${profile.trainings_this_week}/5`, color: "text-primary", containerClass: "icon-container" },
+            { icon: Shield, label: "Nível físico", value: `${profile.physical_level}%`, color: "text-accent", containerClass: "icon-container-accent" },
+            { icon: Timer, label: "Treinos total", value: `${completedCount}`, color: "text-primary", containerClass: "icon-container" },
+          ].map(({ icon: Icon, label, value, color, containerClass }, i) => (
             <div
               key={label}
-              className="gradient-card rounded-xl p-3 border border-border/20 text-center animate-slide-up card-hover"
+              className="gradient-card rounded-2xl p-3 border border-border/20 text-center animate-slide-up card-hover"
               style={{ animationDelay: `${0.2 + i * 0.1}s` }}
             >
-              <Icon className={cn("w-5 h-5 mx-auto mb-1", color)} />
-              <p className="text-lg font-heading font-bold">{value}</p>
+              <div className={cn(containerClass, "w-8 h-8 rounded-lg mx-auto mb-2")}>
+                <Icon className={cn("w-4 h-4", color)} />
+              </div>
+              <p className="text-lg font-heading font-extrabold">{value}</p>
               <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{label}</p>
             </div>
           ))}
         </div>
 
         {/* Chart */}
-        <div className="gradient-card rounded-xl p-4 border border-border/20 animate-slide-up card-hover" style={{ animationDelay: "0.5s" }}>
-          <div className="flex items-center gap-2 mb-3">
-            <Trophy className="w-4 h-4 text-highlight" />
-            <h3 className="font-heading text-sm font-bold">Evolução — 30 dias</h3>
+        <div className="gradient-card rounded-2xl p-4 border border-border/20 animate-slide-up card-hover" style={{ animationDelay: "0.5s" }}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="icon-container-gold">
+              <Trophy className="w-4 h-4 text-yellow-500" />
+            </div>
+            <h3 className="section-title">Evolução — 30 dias</h3>
           </div>
           <div className="h-28">
             <ResponsiveContainer width="100%" height="100%">

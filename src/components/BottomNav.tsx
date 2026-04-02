@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Chrome as Home, Dumbbell, User, Brain, CalendarDays } from "lucide-react";
+import { Home, Dumbbell, User, Brain, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -15,7 +15,7 @@ const BottomNav = () => {
   const navigate = useNavigate();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t border-border/50">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-t border-border/30">
       <div className="flex items-center justify-around max-w-md mx-auto h-16">
         {navItems.map(({ path, label, icon: Icon }) => {
           const active = location.pathname === path;
@@ -24,12 +24,26 @@ const BottomNav = () => {
               key={path}
               onClick={() => navigate(path)}
               className={cn(
-                "flex flex-col items-center gap-0.5 px-4 py-2 rounded-lg transition-all duration-200",
-                active ? "text-primary scale-110" : "text-muted-foreground hover:text-foreground hover:scale-105"
+                "flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all duration-200 relative",
+                active ? "text-primary" : "text-muted-foreground hover:text-foreground hover:scale-105"
               )}
             >
-              <Icon className={cn("w-5 h-5", active && "drop-shadow-[0_0_8px_hsl(var(--primary))]")} />
-              <span className="text-[10px] font-medium">{label}</span>
+              {active && (
+                <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))]" />
+              )}
+              <div className={cn(
+                "transition-all duration-200",
+                active && "scale-110"
+              )}>
+                <Icon className={cn(
+                  "w-5 h-5",
+                  active && "drop-shadow-[0_0_8px_hsl(var(--primary))]"
+                )} />
+              </div>
+              <span className={cn(
+                "text-[10px] font-medium transition-all",
+                active && "font-bold"
+              )}>{label}</span>
             </button>
           );
         })}
