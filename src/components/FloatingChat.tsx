@@ -154,7 +154,6 @@ const FloatingChat = () => {
     const messageText = text || input.trim();
     if (!messageText || loading) return;
     if (!canSendMessage()) {
-      toast.error("Limite de 3 mensagens por dia atingido!");
       return;
     }
 
