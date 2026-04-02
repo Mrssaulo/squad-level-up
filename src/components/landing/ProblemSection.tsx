@@ -14,7 +14,7 @@ const ProblemSection = () => {
               <span className="text-muted-foreground">atrasa sua evolução.</span>
             </h2>
             <p className="text-muted-foreground text-base md:text-lg mt-5 max-w-2xl mx-auto leading-relaxed">
-              Muitos atletas treinam com esforço, mas sem estrutura. Pulam entre exercícios, repetem rotinas genéricas e não conseguem enxergar progresso com clareza. O problema não é só treinar. É treinar com lógica.
+              Muito atleta se esforça, mas continua preso em rotina genérica, treino desconectado e progresso difícil de enxergar. O problema não é só treinar. É treinar com lógica.
             </p>
           </div>
         </FadeInSection>

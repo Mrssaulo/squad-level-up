@@ -19,7 +19,7 @@ const benefits = [
   },
   {
     icon: Flame,
-    title: "Ganhe disciplina de preparação",
+    title: "Construa disciplina de preparação",
     desc: "Transforme treino em processo, não em tentativa aleatória.",
   },
 ];

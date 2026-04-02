@@ -5,7 +5,7 @@ const pillars = [
   {
     icon: Shield,
     title: "Treino por posição",
-    desc: "Receba orientações mais coerentes com a exigência real da sua função em campo.",
+    desc: "Mais coerência com a exigência real da sua função em campo.",
   },
   {
     icon: Calendar,
