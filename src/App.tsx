@@ -19,6 +19,7 @@ import Calendario from "./pages/Calendario";
 import Ranking from "./pages/Ranking";
 import FloatingChat from "./components/FloatingChat";
 import NotFound from "./pages/NotFound";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => {
               <Route path="/historico" element={<Historico />} />
               <Route path="/calendario" element={<Calendario />} />
               <Route path="/ranking" element={<Ranking />} />
+              <Route path="/admin" element={<Admin />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <FloatingChat />
