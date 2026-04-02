@@ -123,7 +123,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 page-enter">
       <div className="gradient-field px-4 pt-6 pb-8">
         <div className="flex items-center gap-3 animate-fade-in">
           <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center text-2xl border-2 border-primary/50">
