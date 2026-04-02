@@ -129,7 +129,7 @@ const Treinos = () => {
           ))}
         </div>
 
-        <div className="space-y-3">
+        <div className="px-4 max-w-md mx-auto space-y-3">
           {filtered.length === 0 && (
             <p className="text-center text-muted-foreground text-sm py-8">Nenhum treino encontrado para esses filtros.</p>
           )}
