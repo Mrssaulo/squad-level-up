@@ -91,6 +91,7 @@ const Dashboard = () => {
 
     const fetchData = async () => {
       setProfileLoading(true);
+      console.log("[Dashboard] fetchData started for user:", user.id);
 
       try {
         const { data: existingProfile, error: profileError } = await supabase
