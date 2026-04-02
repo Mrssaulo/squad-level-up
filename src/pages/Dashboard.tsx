@@ -144,7 +144,7 @@ const Dashboard = () => {
 
       <div className="px-4 -mt-4 space-y-4 max-w-md mx-auto">
         {/* AI Training Suggestion */}
-        <div className="gradient-card rounded-xl p-5 border border-border/30 animate-slide-up" style={{ animationDelay: "0.1s" }}>
+        <div className="gradient-card rounded-xl p-5 border border-border/30 animate-slide-up card-hover" style={{ animationDelay: "0.1s" }}>
           <div className="flex items-center gap-2 mb-3">
             {aiLoading ? <Loader2 className="w-5 h-5 text-primary animate-spin" /> : <Brain className="w-5 h-5 text-primary" />}
             <h3 className="font-heading text-base font-bold">
