@@ -51,22 +51,35 @@ serve(async (req) => {
       systemPrompt = `Analise a seguinte mensagem e classifique em UMA das categorias: treino, nutrição, mentalidade. Responda APENAS com a palavra da categoria, nada mais.`;
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...(messages || [{ role: "user", content: "Analise meus dados e me dê recomendações." }]),
-        ],
-        stream: type === "chat",
-        ...(type === "daily-suggestion" ? { response_format: { type: "json_object" } } : {}),
-      }),
+    const aiBody = JSON.stringify({
+      model: "google/gemini-3-flash-preview",
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...(messages || [{ role: "user", content: "Analise meus dados e me dê recomendações." }]),
+      ],
+      stream: type === "chat",
+      ...(type === "daily-suggestion" ? { response_format: { type: "json_object" } } : {}),
     });
+
+    // Retry with exponential backoff for rate limits
+    let response: Response | null = null;
+    const maxRetries = 3;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: aiBody,
+      });
+
+      if (response.status !== 429 || attempt === maxRetries) break;
+      const delay = Math.pow(2, attempt + 1) * 1000; // 2s, 4s, 8s
+      await new Promise((r) => setTimeout(r, delay));
+    }
+
+    if (!response) throw new Error("No response from AI gateway");
 
     if (!response.ok) {
       if (response.status === 429) {
