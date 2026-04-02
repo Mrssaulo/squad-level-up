@@ -56,6 +56,11 @@ export default {
           dark: "hsl(var(--field-dark))",
         },
         highlight: "hsl(var(--highlight))",
+        surface: {
+          1: "hsl(var(--surface-1))",
+          2: "hsl(var(--surface-2))",
+          3: "hsl(var(--surface-3))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
