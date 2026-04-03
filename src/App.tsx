@@ -31,14 +31,53 @@ const queryClient = new QueryClient({
   },
 });
 
+const hasBackendConfig = Boolean(
+  import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+);
+
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
     <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
   </div>
 );
 
+const BackendUnavailablePage = ({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) => (
+  <div className="min-h-screen flex items-center justify-center bg-background p-6">
+    <div className="w-full max-w-md rounded-3xl border border-border bg-card p-6 text-center shadow-sm">
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-2 text-2xl">
+        ⚠️
+      </div>
+      <div className="space-y-2">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">Área interna</p>
+        <h1 className="text-xl font-heading font-bold text-foreground">{title}</h1>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </div>
+      <div className="mt-6 flex flex-col gap-2 sm:flex-row">
+        <button
+          onClick={() => window.location.reload()}
+          className="inline-flex h-11 flex-1 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground"
+        >
+          Recarregar
+        </button>
+        <button
+          onClick={() => window.location.assign("/")}
+          className="inline-flex h-11 flex-1 items-center justify-center rounded-lg bg-surface-2 px-4 text-sm font-semibold text-foreground"
+        >
+          Ir para início
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
 /** Wraps a lazy page with its own error boundary so one broken page doesn't kill the app */
-const SafePage = ({ children }: { children: React.ReactNode }) => (
+const SafePage = ({ children }: { children: ReactNode }) => (
   <ErrorBoundary
     fallback={
       <div className="min-h-screen flex items-center justify-center bg-background p-6">
@@ -64,6 +103,30 @@ const AuthenticatedPage = ({ children }: { children: ReactNode }) => (
   </SafePage>
 );
 
+const authRouteElement = (children: ReactNode) =>
+  hasBackendConfig ? (
+    <AuthenticatedPage>{children}</AuthenticatedPage>
+  ) : (
+    <SafePage>
+      <BackendUnavailablePage
+        title="Acesso temporariamente indisponível"
+        description="Esta publicação está sem a configuração necessária para abrir login, cadastro e recuperação de senha. Atualize a publicação e tente novamente."
+      />
+    </SafePage>
+  );
+
+const protectedRouteElement = (children: ReactNode) =>
+  hasBackendConfig ? (
+    <AuthenticatedPage>{children}</AuthenticatedPage>
+  ) : (
+    <SafePage>
+      <BackendUnavailablePage
+        title="Área do atleta indisponível"
+        description="A página interna depende da configuração do backend desta publicação. Atualize a publicação para liberar login e painel."
+      />
+    </SafePage>
+  );
+
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
   const hideSplash = useCallback(() => setShowSplash(false), []);
@@ -78,18 +141,18 @@ const App = () => {
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/" element={<SafePage><LandingPage /></SafePage>} />
-                <Route path="/login" element={<AuthenticatedPage><Login /></AuthenticatedPage>} />
-                <Route path="/reset-password" element={<AuthenticatedPage><ResetPassword /></AuthenticatedPage>} />
-                <Route path="/dashboard" element={<AuthenticatedPage><Dashboard /></AuthenticatedPage>} />
-                <Route path="/treinos" element={<AuthenticatedPage><Treinos /></AuthenticatedPage>} />
-                <Route path="/avaliacao" element={<AuthenticatedPage><Avaliacao /></AuthenticatedPage>} />
-                <Route path="/personal" element={<AuthenticatedPage><PersonalTrainer /></AuthenticatedPage>} />
-                <Route path="/active-training" element={<AuthenticatedPage><ActiveTraining /></AuthenticatedPage>} />
-                <Route path="/training-complete" element={<AuthenticatedPage><TrainingComplete /></AuthenticatedPage>} />
-                <Route path="/historico" element={<AuthenticatedPage><Historico /></AuthenticatedPage>} />
-                <Route path="/calendario" element={<AuthenticatedPage><Calendario /></AuthenticatedPage>} />
-                <Route path="/ranking" element={<AuthenticatedPage><Ranking /></AuthenticatedPage>} />
-                <Route path="/admin" element={<AuthenticatedPage><Admin /></AuthenticatedPage>} />
+                <Route path="/login" element={authRouteElement(<Login />)} />
+                <Route path="/reset-password" element={authRouteElement(<ResetPassword />)} />
+                <Route path="/dashboard" element={protectedRouteElement(<Dashboard />)} />
+                <Route path="/treinos" element={protectedRouteElement(<Treinos />)} />
+                <Route path="/avaliacao" element={protectedRouteElement(<Avaliacao />)} />
+                <Route path="/personal" element={protectedRouteElement(<PersonalTrainer />)} />
+                <Route path="/active-training" element={protectedRouteElement(<ActiveTraining />)} />
+                <Route path="/training-complete" element={protectedRouteElement(<TrainingComplete />)} />
+                <Route path="/historico" element={protectedRouteElement(<Historico />)} />
+                <Route path="/calendario" element={protectedRouteElement(<Calendario />)} />
+                <Route path="/ranking" element={protectedRouteElement(<Ranking />)} />
+                <Route path="/admin" element={protectedRouteElement(<Admin />)} />
                 <Route path="*" element={<SafePage><NotFound /></SafePage>} />
               </Routes>
             </Suspense>
