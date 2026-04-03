@@ -1,4 +1,6 @@
-const AI_URL = `${import.meta.env.VITE_SUPABASE_URL || ""}/functions/v1/ai-coach`;
+import { backendPublishableKey, backendUrl } from "@/lib/backend";
+
+const AI_URL = `${backendUrl}/functions/v1/ai-coach`;
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -16,11 +18,6 @@ function safeParse<T>(json: string | null, fallback: T): T {
 }
 
 export async function callAI(messages: Msg[], type: string, context?: Record<string, unknown>) {
-  if (!import.meta.env.VITE_SUPABASE_URL) {
-    console.warn("[callAI] VITE_SUPABASE_URL missing – skipping AI call");
-    throw new Error("Configuração de ambiente indisponível");
-  }
-
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30_000);
 
@@ -29,7 +26,7 @@ export async function callAI(messages: Msg[], type: string, context?: Record<str
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        Authorization: `Bearer ${backendPublishableKey}`,
       },
       body: JSON.stringify({ messages, type, context }),
       signal: controller.signal,
@@ -59,11 +56,6 @@ export async function streamChat({
   onDelta: (text: string) => void;
   onDone: () => void;
 }) {
-  if (!import.meta.env.VITE_SUPABASE_URL) {
-    onDone();
-    throw new Error("Configuração de ambiente indisponível");
-  }
-
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 60_000);
 
@@ -72,7 +64,7 @@ export async function streamChat({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        Authorization: `Bearer ${backendPublishableKey}`,
       },
       body: JSON.stringify({ messages, type: "chat" }),
       signal: controller.signal,
