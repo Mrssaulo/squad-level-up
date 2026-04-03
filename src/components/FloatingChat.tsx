@@ -6,7 +6,7 @@ import { streamChat, canSendMessage, recordMessage, getRemainingMessages } from 
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { backendPublishableKey, backendUrl, supabase } from "@/lib/backend";
 import ReactMarkdown from "react-markdown";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -79,7 +79,7 @@ const FloatingChat = () => {
 
   const categorizeMessage = async (text: string): Promise<string> => {
     try {
-      const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-coach`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` }, body: JSON.stringify({ messages: [{ role: "user", content: text }], type: "categorize" }) });
+      const resp = await fetch(`${backendUrl}/functions/v1/ai-coach`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${backendPublishableKey}` }, body: JSON.stringify({ messages: [{ role: "user", content: text }], type: "categorize" }) });
       if (!resp.ok) return "treino";
       const data = await resp.json(); const cat = (data.choices?.[0]?.message?.content || "treino").toLowerCase().trim();
       return ["treino", "nutrição", "mentalidade"].includes(cat) ? cat : "treino";

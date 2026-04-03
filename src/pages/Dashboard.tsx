@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/backend";
 import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
 import OnboardingTour, { type TourStep } from "@/components/OnboardingTour";

@@ -38,7 +38,7 @@ const PageLoader = () => (
 );
 
 /** Wraps a lazy page with its own error boundary so one broken page doesn't kill the app */
-const SafePage = ({ children }: { children: React.ReactNode }) => (
+const SafePage = ({ children }: { children: ReactNode }) => (
   <ErrorBoundary
     fallback={
       <div className="min-h-screen flex items-center justify-center bg-background p-6">
