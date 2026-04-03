@@ -5,13 +5,9 @@ import { ArrowRight, ArrowDown, X, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface TourStep {
-  /** CSS selector for the target element */
   target: string;
-  /** Title of the tooltip */
   title: string;
-  /** Description text */
   description: string;
-  /** Arrow direction pointing to the element */
   placement?: "top" | "bottom" | "left" | "right";
 }
 
@@ -30,7 +26,6 @@ const OnboardingTour = ({ steps, storageKey, onComplete }: OnboardingTourProps) 
   useEffect(() => {
     const seen = localStorage.getItem(storageKey);
     if (!seen) {
-      // Small delay so DOM elements are rendered
       const timer = setTimeout(() => setVisible(true), 1200);
       return () => clearTimeout(timer);
     }
@@ -41,14 +36,21 @@ const OnboardingTour = ({ steps, storageKey, onComplete }: OnboardingTourProps) 
 
     const step = steps[currentStep];
     const el = document.querySelector(step.target);
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const isMobile = vw < 480;
+    const tooltipWidth = isMobile ? Math.min(vw - 32, 300) : 280;
+    const tooltipHeight = 140;
+    const padding = isMobile ? 8 : 12;
 
     if (!el) {
-      // Element not found, center tooltip
       setTooltipStyle({
         position: "fixed",
         top: "50%",
         left: "50%",
         transform: "translate(-50%, -50%)",
+        width: `${tooltipWidth}px`,
+        maxWidth: "calc(100vw - 32px)",
         zIndex: 10001,
       });
       setArrowStyle({ display: "none" });
@@ -56,32 +58,31 @@ const OnboardingTour = ({ steps, storageKey, onComplete }: OnboardingTourProps) 
     }
 
     const rect = el.getBoundingClientRect();
-    const placement = step.placement || "bottom";
-    const padding = 12;
-
-    // Highlight the element
     el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    // On mobile, always place tooltip below or above the element
+    let placement = step.placement || "bottom";
+    if (isMobile && (placement === "left" || placement === "right")) {
+      placement = rect.top > vh / 2 ? "top" : "bottom";
+    }
 
     let top = 0;
     let left = 0;
     let arrowTop = 0;
     let arrowLeft = 0;
 
-    const tooltipWidth = 280;
-    const tooltipHeight = 140;
-
     switch (placement) {
       case "bottom":
         top = rect.bottom + padding;
-        left = Math.max(16, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 16));
+        left = Math.max(16, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, vw - tooltipWidth - 16));
         arrowTop = rect.bottom + 2;
-        arrowLeft = rect.left + rect.width / 2 - 8;
+        arrowLeft = Math.min(Math.max(rect.left + rect.width / 2 - 8, 24), vw - 24);
         break;
       case "top":
         top = rect.top - tooltipHeight - padding;
-        left = Math.max(16, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 16));
+        left = Math.max(16, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, vw - tooltipWidth - 16));
         arrowTop = rect.top - padding + 2;
-        arrowLeft = rect.left + rect.width / 2 - 8;
+        arrowLeft = Math.min(Math.max(rect.left + rect.width / 2 - 8, 24), vw - 24);
         break;
       case "right":
         top = rect.top + rect.height / 2 - tooltipHeight / 2;
@@ -97,11 +98,15 @@ const OnboardingTour = ({ steps, storageKey, onComplete }: OnboardingTourProps) 
         break;
     }
 
+    // Clamp top so tooltip never goes off-screen
+    top = Math.max(16, Math.min(top, vh - tooltipHeight - 16));
+
     setTooltipStyle({
       position: "fixed",
-      top: `${Math.max(16, top)}px`,
+      top: `${top}px`,
       left: `${left}px`,
       width: `${tooltipWidth}px`,
+      maxWidth: "calc(100vw - 32px)",
       zIndex: 10001,
     });
 
@@ -151,63 +156,63 @@ const OnboardingTour = ({ steps, storageKey, onComplete }: OnboardingTourProps) 
           ...(targetRect && {
             clipPath: `polygon(
               0% 0%, 0% 100%, 
-              ${targetRect.left - 6}px 100%, 
-              ${targetRect.left - 6}px ${targetRect.top - 6}px, 
-              ${targetRect.right + 6}px ${targetRect.top - 6}px, 
-              ${targetRect.right + 6}px ${targetRect.bottom + 6}px, 
-              ${targetRect.left - 6}px ${targetRect.bottom + 6}px, 
-              ${targetRect.left - 6}px 100%, 
+              ${targetRect.left - 4}px 100%, 
+              ${targetRect.left - 4}px ${targetRect.top - 4}px, 
+              ${targetRect.right + 4}px ${targetRect.top - 4}px, 
+              ${targetRect.right + 4}px ${targetRect.bottom + 4}px, 
+              ${targetRect.left - 4}px ${targetRect.bottom + 4}px, 
+              ${targetRect.left - 4}px 100%, 
               100% 100%, 100% 0%
             )`,
           }),
         }}
       />
 
-      {/* Highlight ring around target */}
+      {/* Highlight ring */}
       {targetRect && (
         <div
           className="fixed z-[10000] rounded-xl border-2 border-primary animate-pulse pointer-events-none"
           style={{
-            top: targetRect.top - 6,
-            left: targetRect.left - 6,
-            width: targetRect.width + 12,
-            height: targetRect.height + 12,
-            boxShadow: "0 0 20px hsl(var(--primary) / 0.4)",
+            top: targetRect.top - 4,
+            left: targetRect.left - 4,
+            width: targetRect.width + 8,
+            height: targetRect.height + 8,
+            boxShadow: "0 0 16px hsl(var(--primary) / 0.4)",
           }}
         />
       )}
 
-      {/* Arrow indicator */}
+      {/* Arrow */}
       <div style={arrowStyle} className="text-primary">
         {(step.placement === "bottom" || !step.placement) && (
-          <ArrowDown className="w-5 h-5 animate-bounce" />
+          <ArrowDown className="w-4 h-4 animate-bounce" />
         )}
         {step.placement === "top" && (
-          <ArrowDown className="w-5 h-5 animate-bounce rotate-180" />
+          <ArrowDown className="w-4 h-4 animate-bounce rotate-180" />
         )}
         {step.placement === "right" && (
-          <ArrowRight className="w-5 h-5 animate-bounce" />
+          <ArrowRight className="w-4 h-4 animate-bounce" />
         )}
         {step.placement === "left" && (
-          <ArrowRight className="w-5 h-5 animate-bounce rotate-180" />
+          <ArrowRight className="w-4 h-4 animate-bounce rotate-180" />
         )}
       </div>
 
       {/* Tooltip */}
       <div
         style={tooltipStyle}
-        className="bg-card border border-border/40 rounded-2xl p-4 shadow-2xl shadow-black/40 animate-scale-in"
+        className="bg-card border border-border/40 rounded-2xl p-3 sm:p-4 shadow-2xl shadow-black/40 animate-scale-in"
       >
-        <div className="flex items-start justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <h3 className="font-heading text-sm font-bold text-foreground">{step.title}</h3>
+        <div className="flex items-start justify-between mb-1.5 sm:mb-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary shrink-0" />
+            <h3 className="font-heading text-xs sm:text-sm font-bold text-foreground truncate">{step.title}</h3>
           </div>
-          <button onClick={handleClose} className="text-muted-foreground hover:text-foreground transition-colors p-0.5">
-            <X className="w-4 h-4" />
+          <button onClick={handleClose} className="text-muted-foreground hover:text-foreground transition-colors p-0.5 shrink-0 ml-1">
+            <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
-        <p className="text-xs text-muted-foreground mb-4 leading-relaxed">{step.description}</p>
+        <p className="text-[11px] sm:text-xs text-muted-foreground mb-3 sm:mb-4 leading-relaxed">{step.description}</p>
         <div className="flex items-center justify-between">
           <div className="flex gap-1">
             {steps.map((_, i) => (
@@ -220,7 +225,7 @@ const OnboardingTour = ({ steps, storageKey, onComplete }: OnboardingTourProps) 
               />
             ))}
           </div>
-          <Button size="sm" onClick={handleNext} className="h-8 text-xs font-semibold bg-primary hover:bg-primary/90">
+          <Button size="sm" onClick={handleNext} className="h-7 sm:h-8 text-[11px] sm:text-xs font-semibold bg-primary hover:bg-primary/90 px-3">
             {isLast ? "Começar!" : "Próximo"}
             {!isLast && <ArrowRight className="w-3 h-3 ml-1" />}
           </Button>
