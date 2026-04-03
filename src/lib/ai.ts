@@ -16,24 +16,38 @@ function safeParse<T>(json: string | null, fallback: T): T {
 }
 
 export async function callAI(messages: Msg[], type: string, context?: Record<string, unknown>) {
-  if (!import.meta.env.VITE_SUPABASE_URL) throw new Error("Configuração de ambiente indisponível");
-
-  const resp = await fetch(AI_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-    },
-    body: JSON.stringify({ messages, type, context }),
-  });
-
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({ error: "Erro na IA" }));
-    throw new Error(err.error || "Erro na IA");
+  if (!import.meta.env.VITE_SUPABASE_URL) {
+    console.warn("[callAI] VITE_SUPABASE_URL missing – skipping AI call");
+    throw new Error("Configuração de ambiente indisponível");
   }
 
-  const data = await resp.json();
-  return data.choices?.[0]?.message?.content || "";
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30_000);
+
+  try {
+    const resp = await fetch(AI_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ messages, type, context }),
+      signal: controller.signal,
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: "Erro na IA" }));
+      throw new Error(err.error || "Erro na IA");
+    }
+
+    const data = await resp.json();
+    return data.choices?.[0]?.message?.content || "";
+  } catch (e: any) {
+    if (e.name === "AbortError") throw new Error("A requisição de IA demorou demais. Tente novamente.");
+    throw e;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export async function streamChat({
@@ -50,45 +64,56 @@ export async function streamChat({
     throw new Error("Configuração de ambiente indisponível");
   }
 
-  const resp = await fetch(AI_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-    },
-    body: JSON.stringify({ messages, type: "chat" }),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 60_000);
 
-  if (!resp.ok || !resp.body) {
-    const err = await resp.json().catch(() => ({ error: "Erro na IA" }));
-    throw new Error(err.error || "Erro na IA");
-  }
+  try {
+    const resp = await fetch(AI_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ messages, type: "chat" }),
+      signal: controller.signal,
+    });
 
-  const reader = resp.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-
-    let idx: number;
-    while ((idx = buffer.indexOf("\n")) !== -1) {
-      let line = buffer.slice(0, idx);
-      buffer = buffer.slice(idx + 1);
-      if (line.endsWith("\r")) line = line.slice(0, -1);
-      if (!line.startsWith("data: ")) continue;
-      const json = line.slice(6).trim();
-      if (json === "[DONE]") { onDone(); return; }
-      try {
-        const parsed = JSON.parse(json);
-        const content = parsed.choices?.[0]?.delta?.content;
-        if (content) onDelta(content);
-      } catch { /* partial json */ }
+    if (!resp.ok || !resp.body) {
+      const err = await resp.json().catch(() => ({ error: "Erro na IA" }));
+      throw new Error(err.error || "Erro na IA");
     }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      let idx: number;
+      while ((idx = buffer.indexOf("\n")) !== -1) {
+        let line = buffer.slice(0, idx);
+        buffer = buffer.slice(idx + 1);
+        if (line.endsWith("\r")) line = line.slice(0, -1);
+        if (!line.startsWith("data: ")) continue;
+        const json = line.slice(6).trim();
+        if (json === "[DONE]") { onDone(); return; }
+        try {
+          const parsed = JSON.parse(json);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) onDelta(content);
+        } catch { /* partial json */ }
+      }
+    }
+    onDone();
+  } catch (e: any) {
+    if (e.name === "AbortError") throw new Error("A conexão com o coach expirou. Tente novamente.");
+    throw e;
+  } finally {
+    clearTimeout(timeout);
   }
-  onDone();
 }
 
 // Daily message limit
