@@ -5,10 +5,10 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => setFadeOut(true), 1600);
-    const doneTimer = setTimeout(onFinish, 2000);
-    // Safety: force finish after 4s even if something blocks
-    const safetyTimer = setTimeout(onFinish, 4000);
+    const fadeTimer = setTimeout(() => setFadeOut(true), 1000);
+    const doneTimer = setTimeout(onFinish, 1400);
+    // Safety: force finish after 3s even if something blocks
+    const safetyTimer = setTimeout(onFinish, 3000);
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(doneTimer);

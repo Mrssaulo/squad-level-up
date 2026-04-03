@@ -22,7 +22,12 @@
 </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#111520">
+        <div style="width:24px;height:24px;border:2px solid #2d9d5a;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+      </div>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
