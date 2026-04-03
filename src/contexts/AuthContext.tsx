@@ -39,10 +39,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Don't call setLoading here — getSession handles initial load
     });
 
-    // Safety: if auth takes too long, unblock the app
     const safetyTimeout = setTimeout(() => {
       if (mounted && loading) setLoading(false);
-    }, 5000);
+    }, 4000);
 
     return () => {
       mounted = false;
