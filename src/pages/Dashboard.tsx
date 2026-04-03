@@ -106,7 +106,10 @@ const Dashboard = () => {
           const parsed = JSON.parse(result);
           setAiSuggestion(parsed);
           try { localStorage.setItem(cacheKey, JSON.stringify(parsed)); } catch { /* */ }
-        } catch (error) { console.error("Error generating daily suggestion:", error); }
+        } catch (error) {
+          console.error("Error generating daily suggestion:", error);
+          // Don't block the dashboard — the user can still navigate and use the app
+        }
         finally { if (isMounted) setAiLoading(false); }
       } catch (error) {
         console.error("Error loading dashboard:", error);
