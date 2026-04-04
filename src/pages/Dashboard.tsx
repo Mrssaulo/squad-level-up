@@ -40,6 +40,7 @@ const levelColors: Record<string, string> = {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, signOut, loading: authLoading } = useAuth();
+  const { subscribed } = useSubscription();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [completedCount, setCompletedCount] = useState(0);
