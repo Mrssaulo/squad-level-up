@@ -19,6 +19,7 @@ const TrainingComplete = lazy(() => import("./pages/TrainingComplete"));
 const Historico = lazy(() => import("./pages/Historico"));
 const Calendario = lazy(() => import("./pages/Calendario"));
 const Ranking = lazy(() => import("./pages/Ranking"));
+const Planos = lazy(() => import("./pages/Planos"));
 const Admin = lazy(() => import("./pages/Admin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -89,7 +90,9 @@ const App = () => {
                 <Route path="/historico" element={<AuthenticatedPage><Historico /></AuthenticatedPage>} />
                 <Route path="/calendario" element={<AuthenticatedPage><Calendario /></AuthenticatedPage>} />
                 <Route path="/ranking" element={<AuthenticatedPage><Ranking /></AuthenticatedPage>} />
+                <Route path="/planos" element={<AuthenticatedPage><Planos /></AuthenticatedPage>} />
                 <Route path="/admin" element={<AuthenticatedPage><Admin /></AuthenticatedPage>} />
+                <Route path="*" element={<SafePage><NotFound /></SafePage>} />
                 <Route path="*" element={<SafePage><NotFound /></SafePage>} />
               </Routes>
             </Suspense>

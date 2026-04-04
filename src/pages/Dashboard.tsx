@@ -1,11 +1,14 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/lib/backend";
 import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
 import OnboardingTour, { type TourStep } from "@/components/OnboardingTour";
-import { Activity, Timer, Shield, LogOut, Loader2, CalendarDays, Eye, Trash2, ArrowRight, TrendingUp } from "lucide-react";
+import { Activity, Timer, Shield, LogOut, Loader2, CalendarDays, Eye, Trash2, ArrowRight, TrendingUp, Crown } from "lucide-react";
+import PremiumBadge from "@/components/PremiumBadge";
+import UpgradePrompt from "@/components/UpgradePrompt";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -37,6 +40,7 @@ const levelColors: Record<string, string> = {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, signOut, loading: authLoading } = useAuth();
+  const { subscribed } = useSubscription();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [completedCount, setCompletedCount] = useState(0);
@@ -154,7 +158,10 @@ const Dashboard = () => {
         <div className="relative flex items-center gap-3 animate-fade-in max-w-md mx-auto">
           <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center text-xl">⚽</div>
           <div className="flex-1">
-            <h2 className="font-heading text-lg font-extrabold text-foreground tracking-tight">{profile.name}</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="font-heading text-lg font-extrabold text-foreground tracking-tight">{profile.name}</h2>
+              {subscribed && <PremiumBadge />}
+            </div>
             <p className="text-xs text-muted-foreground">{profile.position} · {profile.age} anos</p>
           </div>
           <span className={cn("px-2.5 py-1 rounded-full text-[10px] font-bold border", levelColors[profile.level] || levelColors.Iniciante)}>
@@ -307,6 +314,9 @@ const Dashboard = () => {
             <p className="text-[10px] text-muted-foreground mt-0.5">Seus indicadores</p>
           </button>
         </div>
+        {!subscribed && (
+          <UpgradePrompt compact className="animate-slide-up" />
+        )}
       </div>
 
       <BottomNav />
