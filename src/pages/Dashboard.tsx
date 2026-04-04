@@ -158,7 +158,10 @@ const Dashboard = () => {
         <div className="relative flex items-center gap-3 animate-fade-in max-w-md mx-auto">
           <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center text-xl">⚽</div>
           <div className="flex-1">
-            <h2 className="font-heading text-lg font-extrabold text-foreground tracking-tight">{profile.name}</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="font-heading text-lg font-extrabold text-foreground tracking-tight">{profile.name}</h2>
+              {subscribed && <PremiumBadge />}
+            </div>
             <p className="text-xs text-muted-foreground">{profile.position} · {profile.age} anos</p>
           </div>
           <span className={cn("px-2.5 py-1 rounded-full text-[10px] font-bold border", levelColors[profile.level] || levelColors.Iniciante)}>
