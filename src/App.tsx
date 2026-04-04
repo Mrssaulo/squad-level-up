@@ -19,6 +19,7 @@ const TrainingComplete = lazy(() => import("./pages/TrainingComplete"));
 const Historico = lazy(() => import("./pages/Historico"));
 const Calendario = lazy(() => import("./pages/Calendario"));
 const Ranking = lazy(() => import("./pages/Ranking"));
+const Planos = lazy(() => import("./pages/Planos"));
 const Admin = lazy(() => import("./pages/Admin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
