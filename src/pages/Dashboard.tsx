@@ -314,6 +314,9 @@ const Dashboard = () => {
             <p className="text-[10px] text-muted-foreground mt-0.5">Seus indicadores</p>
           </button>
         </div>
+        {!subscribed && (
+          <UpgradePrompt compact className="animate-slide-up" />
+        )}
       </div>
 
       <BottomNav />
