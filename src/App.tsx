@@ -90,7 +90,9 @@ const App = () => {
                 <Route path="/historico" element={<AuthenticatedPage><Historico /></AuthenticatedPage>} />
                 <Route path="/calendario" element={<AuthenticatedPage><Calendario /></AuthenticatedPage>} />
                 <Route path="/ranking" element={<AuthenticatedPage><Ranking /></AuthenticatedPage>} />
+                <Route path="/planos" element={<AuthenticatedPage><Planos /></AuthenticatedPage>} />
                 <Route path="/admin" element={<AuthenticatedPage><Admin /></AuthenticatedPage>} />
+                <Route path="*" element={<SafePage><NotFound /></SafePage>} />
                 <Route path="*" element={<SafePage><NotFound /></SafePage>} />
               </Routes>
             </Suspense>
