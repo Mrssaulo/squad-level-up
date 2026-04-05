@@ -1,19 +1,19 @@
 // Stripe product/price IDs for Pro Futebol SM
 export const PLANS = {
   monthly: {
-    product_id: "prod_UGrTccxgb5XqYq",
-    price_id: "price_1TIJl1K9r3HkkZHnLusugTlu",
+    product_id: "prod_UGUKe0wVs5Pbj8",
+    price_id: "price_1THxLpK6eHUew2Hbqbpgyb0M",
     label: "Mensal",
-    price: "R$ 29,90",
+    price: "R$ 19,90",
     interval: "/mês",
   },
   quarterly: {
-    product_id: "prod_UGrVQdyHP74P0F",
-    price_id: "price_1TIJmXK9r3HkkZHn4qxcE2pv",
+    product_id: "prod_UGUKe0wVs5Pbj8",
+    price_id: "price_1TIniCK6eHUew2HbtyvNGM94",
     label: "Trimestral",
-    price: "R$ 79,90",
+    price: "R$ 49,90",
     interval: "/trimestre",
-    badge: "Economize 11%",
+    badge: "Economize 16%",
   },
 } as const;
 
