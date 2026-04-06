@@ -6,7 +6,7 @@ import { supabase } from "@/lib/backend";
 import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
 import OnboardingTour, { type TourStep } from "@/components/OnboardingTour";
-import { Activity, Timer, Shield, LogOut, Loader2, CalendarDays, Eye, Trash2, ArrowRight, TrendingUp, Crown, MessageCircle } from "lucide-react";
+import { Activity, Timer, Shield, LogOut, Loader2, CalendarDays, Eye, Trash2, ArrowRight, TrendingUp, Crown } from "lucide-react";
 import PremiumBadge from "@/components/PremiumBadge";
 import UpgradePrompt from "@/components/UpgradePrompt";
 import { Button } from "@/components/ui/button";
@@ -318,19 +318,6 @@ const Dashboard = () => {
           <UpgradePrompt compact className="animate-slide-up" />
         )}
 
-        {/* === SUPORTE === */}
-        <div className="premium-card rounded-2xl p-4 animate-slide-up" style={{ animationDelay: "0.55s" }}>
-          <p className="section-title text-primary mb-2">Suporte</p>
-          <a
-            href="https://wa.me/5562999999999?text=Ol%C3%A1!%20Preciso%20de%20ajuda%20com%20o%20Pro%20Futebol%20SM"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 text-foreground hover:bg-[#25D366]/20 transition-colors"
-          >
-            <MessageCircle className="w-5 h-5 text-[#25D366]" />
-            <span className="text-sm font-semibold">Falar com a gente no WhatsApp</span>
-          </a>
-        </div>
       </div>
 
       <BottomNav />
