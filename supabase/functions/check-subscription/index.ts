@@ -97,6 +97,21 @@ serve(async (req) => {
       }).eq("user_id", user.id);
     } else {
       logStep("No active subscription");
+      // Check manual premium before clearing
+      const { data: profile } = await supabaseClient
+        .from("profiles")
+        .select("is_premium, premium_expires_at")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) > new Date()) {
+        logStep("Manual premium active (Stripe customer exists but no sub)", { expires: profile.premium_expires_at });
+        return new Response(JSON.stringify({ subscribed: true, product_id: null, subscription_end: profile.premium_expires_at }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+
       await supabaseClient.from("profiles").update({
         is_premium: false, premium_since: null, premium_expires_at: null, subscription_id: null,
       }).eq("user_id", user.id);
