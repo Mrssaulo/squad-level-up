@@ -6,7 +6,7 @@ import { supabase } from "@/lib/backend";
 import { callAI } from "@/lib/ai";
 import BottomNav from "@/components/BottomNav";
 import OnboardingTour, { type TourStep } from "@/components/OnboardingTour";
-import { Activity, Timer, Shield, LogOut, Loader2, CalendarDays, Eye, Trash2, ArrowRight, TrendingUp, Crown } from "lucide-react";
+import { Activity, Timer, Shield, LogOut, Loader2, CalendarDays, Eye, Trash2, ArrowRight, TrendingUp, Crown, MessageCircle } from "lucide-react";
 import PremiumBadge from "@/components/PremiumBadge";
 import UpgradePrompt from "@/components/UpgradePrompt";
 import { Button } from "@/components/ui/button";
