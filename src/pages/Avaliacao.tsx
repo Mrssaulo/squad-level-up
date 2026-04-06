@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
-import { Activity, Shield, TrendingUp, TrendingDown, Zap, CheckCircle, Brain, Loader2, Sun, Moon } from "lucide-react";
+import { Activity, Shield, TrendingUp, TrendingDown, Zap, CheckCircle, Brain, Loader2, Sun, Moon, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
