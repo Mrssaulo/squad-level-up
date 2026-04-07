@@ -32,15 +32,24 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     try {
       const { data, error } = await supabase.functions.invoke("check-subscription");
       if (error) throw error;
-      setSubscribed(data?.subscribed ?? false);
+      const isSubscribed = data?.subscribed ?? false;
+      setSubscribed(isSubscribed);
       setPlanKey(getPlanByProductId(data?.product_id ?? null));
       setSubscriptionEnd(data?.subscription_end ?? null);
+      // If edge function says not subscribed, double-check profile (manual premium)
+      if (!isSubscribed && user) {
+        const { data: profile } = await supabase.from("profiles").select("is_premium, premium_expires_at").eq("user_id", user.id).maybeSingle();
+        if (profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) > new Date()) {
+          setSubscribed(true);
+        }
+      }
     } catch (err) {
       console.error("Error checking subscription:", err);
-      // Fallback: check profile
       if (user) {
-        const { data: profile } = await supabase.from("profiles").select("is_premium").eq("user_id", user.id).maybeSingle();
-        setSubscribed(profile?.is_premium ?? false);
+        const { data: profile } = await supabase.from("profiles").select("is_premium, premium_expires_at").eq("user_id", user.id).maybeSingle();
+        if (profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) > new Date()) {
+          setSubscribed(true);
+        }
       }
     } finally {
       setLoading(false);
