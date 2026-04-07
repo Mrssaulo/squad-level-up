@@ -21,6 +21,7 @@ const Calendario = lazy(() => import("./pages/Calendario"));
 const Ranking = lazy(() => import("./pages/Ranking"));
 const Planos = lazy(() => import("./pages/Planos"));
 const Admin = lazy(() => import("./pages/Admin"));
+const PagamentoRetorno = lazy(() => import("./pages/PagamentoRetorno"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -92,6 +93,7 @@ const App = () => {
                 <Route path="/ranking" element={<AuthenticatedPage><Ranking /></AuthenticatedPage>} />
                 <Route path="/planos" element={<AuthenticatedPage><Planos /></AuthenticatedPage>} />
                 <Route path="/admin" element={<AuthenticatedPage><Admin /></AuthenticatedPage>} />
+                <Route path="/pagamento/retorno" element={<SafePage><PagamentoRetorno /></SafePage>} />
                 <Route path="*" element={<SafePage><NotFound /></SafePage>} />
                 <Route path="*" element={<SafePage><NotFound /></SafePage>} />
               </Routes>
