@@ -21,6 +21,7 @@ const Calendario = lazy(() => import("./pages/Calendario"));
 const Ranking = lazy(() => import("./pages/Ranking"));
 const Planos = lazy(() => import("./pages/Planos"));
 const Admin = lazy(() => import("./pages/Admin"));
+const PagamentoRetorno = lazy(() => import("./pages/PagamentoRetorno"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
