@@ -68,8 +68,17 @@ const Dashboard = () => {
               name: user.user_metadata?.name || user.email?.split("@")[0] || "Atleta",
               email: user.email || null,
             }).select("*").single();
-          if (createProfileError) throw createProfileError;
-          currentProfile = createdProfile;
+          if (createProfileError) {
+            console.error("Could not create profile:", createProfileError);
+            // Use a default profile so the page still loads
+            currentProfile = {
+              name: user.user_metadata?.name || user.email?.split("@")[0] || "Atleta",
+              position: "Meio-campista", age: 18, level: "Iniciante",
+              trainings_this_week: 0, total_trainings: 0, physical_level: 1, days_until_game: 7,
+            } as any;
+          } else {
+            currentProfile = createdProfile;
+          }
         }
 
         if (!isMounted || !currentProfile) return;
