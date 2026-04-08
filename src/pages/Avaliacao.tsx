@@ -186,7 +186,7 @@ const Avaliacao = () => {
         <div className="premium-card rounded-2xl p-4 mt-4 animate-slide-up" style={{ animationDelay: "0.3s" }}>
           <p className="text-xs font-bold uppercase tracking-wider text-primary mb-2">Suporte</p>
           <button
-            onClick={() => window.open("https://wa.me/5562999999999?text=Ol%C3%A1!%20Preciso%20de%20ajuda%20com%20o%20Pro%20Futebol%20SM", "_blank")}
+            onClick={() => window.open("https://wa.me/5562985153877?text=Ol%C3%A1!%20Preciso%20de%20ajuda%20com%20o%20Pro%20Futebol%20SM", "_blank")}
             className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 text-foreground hover:bg-[#25D366]/20 transition-colors"
           >
             <MessageCircle className="w-5 h-5 text-[#25D366]" />
